@@ -52,6 +52,7 @@ public class cpu{
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
+	static int temp1, temp2, temp3, temp4, temp5;
 	static float res_alu;
 	static String NoSirve;
 
@@ -72,6 +73,15 @@ public class cpu{
 
 	public static void traduce(){ //Traduce los bytés obtenidos
 		
+	}
+	public static float IEEE_a_flotante( int f){
+		float yy = Float.intBitsToFloat((f));
+		return yy;
+	}
+	public static int flotante_a_IEEE(float f){
+		int num = Float.floatToIntBits(f);
+		return num;
+
 	}
 
 	public static void ejecuta(){
@@ -117,6 +127,10 @@ public class cpu{
 				B[ALU_B3] = flotante_a_IEEE(res_alu);
 				break;
 		}
+	}
+	public static int forceint( float f){
+		int valorEntero = (int) f;
+		return valorEntero;
 	}
 
 	public static void dump(int mem){
@@ -191,28 +205,19 @@ public class cpu{
 	}
 
 	public static void main(String[] argumento) {
-		for(int i=0; i<=15; i++){
-			PSW[i] = false;
-		}
-		PSW[15] = true;
-
-		for(int i=0; i<=13; i++){
-			R[i] = 0;
-		}
+		//dump(1105199104);
 		R[RA] = 0x4219147B;
 		R[RB] = 0x42357AE1;
-
+		//dump(1094713344);
 		cod_inst = MUE_REG_BUS;
 		orig = RA;
 		dest = ALU_B1;
 		ejecuta();
-
-		cod_inst = MUE_REG_BUS;
+		dump(1094713344);
+		/*cod_inst = MUE_REG_BUS;
 		orig = RB;
 		dest = ALU_B2;
-		ejecuta();
-
-		dump(1133903872);
+		ejecuta();*/
 		System.out.println("REG A: "+R[RA]+", REG IX: "+R[IX]);
 	}
 }
