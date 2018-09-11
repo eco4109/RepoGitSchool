@@ -54,7 +54,8 @@ public class cpu{
 	//Buffer Arrays, contains bits in each position
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
-
+	
+	static int dato
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
@@ -85,8 +86,14 @@ public class cpu{
 		}
 	}
 
-	public static String bytes_to_bits(Byte stringBytes){ //Method for convert BYTES into bits String
-		String bb = Integer.toBinaryString(r2b[0]); //First the BYTE it´s convert into a String
+	public static String bytes_to_bits(byte stringBytes){ //Method for convert BYTES into bits String
+		String bb = Integer.toBinaryString(stringBytes); //First the BYTE it´s convert into a String
+		//we need to complete the Byte to 8-bits if it's less than 8
+		if(bb.length()<8){
+			while(bb.length()<8){
+				bb = "0"+bb;
+			}
+		}
 		String inBinary = bb.substring(bb.length()-8, bb.length());//Split the String , we need only the lasts 8 bits, so cut it
 		return inBinary;
 	}
@@ -112,6 +119,11 @@ public class cpu{
 		}
 	}
 
+	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
+		int aux = Integer.parseInt(Character.toString(caracter));
+		return aux;
+	}
+
 	public static void traduce(){ 
 		System.out.println("Buffer de 2 bytes (En decimal)");
 		printArrayinDec(r2b);
@@ -131,8 +143,34 @@ public class cpu{
 		printArray(r2binary);
 		System.out.println("4 bytes buffer (In binary)");
 		printArray(r4binary);
-
-		pausa();
+		//Now we've other 2 Arrays with the instructions microcode in each position.
+		//Analizate them, starting for the first bit of all. Validation starts
+		//Transform the first bit of the firs BYTE in INTEGER
+		int erbit = char_to_int(r2binary[0].charAt(0));
+		//Obtain the value of the PSW
+		if((erbit==1)&&(PSW[15]==false)){
+			System.out.println("Kernel mode access violation");
+			System.exit(4);
+		}else{
+			//There isn't violation, so, transform the first BYTE of the 2-BYTES buffer into INT
+			cod_inst = r2b[0]&0xFF;
+			System.out.println("Intruction code: "+cod_inst);
+			//Obtain the secod bit of the first BYTE, thats bit indicate the instruction safety
+			int S = char_to_int(r2binary[0].charAt(1)); 
+			System.out.println("S: "+S);
+			int L = char_to_int(r2binary[0].charAt(2)); 
+			System.out.println("L: "+L);
+			//Large calculate
+			int large = 2 + L * 4;
+			System.out.println("Largo: "+large);
+			if(large == 6){ //If the large it's 6 fill the variable "dato" with the 4 BYTES of the second buffer
+				
+			}else{
+				
+			}
+			pausa();
+			
+		}
 	}
 
 	public static float IEEE_a_flotante( int f){
@@ -277,7 +315,7 @@ public class cpu{
 		for (int i=0;i<=20;i++ ) {
 			RAM[i] = (byte)0x00;
 		}
-		RAM[10] = (byte)0xDB;
+		RAM[10] = (byte)0x7B;
 		RAM[11] = (byte)0x57;
 		RAM[12] = (byte)0xB7;
 		RAM[13] = (byte)0xBC;
