@@ -48,6 +48,9 @@ public class cpu{
 	// int = 4 byte´s
 	// 1Mb de RAM
 	public static byte[] RAM = new byte[1048576]; 
+	//Buffer Arrays
+	public static byte[] r2b = new byte[2];
+	public static byte[] r4b = new byte[4];
 
 	static int cod_inst = 0;
 	static int orig; 
@@ -67,13 +70,41 @@ public class cpu{
 		return nada;
 	}
 
+	public static void printArray(byte[] array){
+		//Print Array Function
+		for (int i=0;i<array.length;i++) {
+			System.out.println(array[i]&0xFF);
+		}
+	}
+
 	public static void capta(){ //Lee byte´s guardados en la memoria RAM
+		//Creacion de los buffers de lectura
 
+		System.out.println("El registro IP, contiene (en flotante): "+IEEE_a_flotante(R[6]));
+		System.out.println("El registro BP, contiene (en flotante): "+IEEE_a_flotante(R[3]));
+		//Suma de los Valores contenidos en el registro IP e IB
+		System.out.println("Se va a leer en la RAM desde :"+IEEE_a_flotante(R[6]));
+
+		float direcMem2 = IEEE_a_flotante(R[6]) + IEEE_a_flotante(R[0]); //R[6], es IP R[3] es IB, o al revés NO RECUERDO BIEN JEJE
+		int direcMem = (int) direcMem2;
+		//Leer 6 bytes de la "RAM" a partir de la posicion calculada+
+		//Guardar los primeros 2 bytes leidos en un buffer y los otros 4 en el otro 
+		for (int i=0;i<=5; i++) { //Ciclo para recorrer 6 bytes en la RAM a partir de la posicion IP + BP
+			if(i<2){
+				r2b[i] = RAM[direcMem + i]; 
+			}else{
+				r4b[i-2] = RAM[direcMem + i];
+			}
+		}
 	}
 
-	public static void traduce(){ //Traduce los bytés obtenidos
-		
+	public static void traduce(){ //Function for translate bytes
+		System.out.println("Buffer de 2 bytes (En decimal)");
+		printArray(r2b);
+		System.out.println("Buffer de 4 bytes (En decimal)");
+		printArray(r4b);
 	}
+
 	public static float IEEE_a_flotante( int f){
 		float yy = Float.intBitsToFloat((f));
 		return yy;
@@ -206,18 +237,32 @@ public class cpu{
 
 	public static void main(String[] argumento) {
 		//dump(1105199104);
-		R[RA] = 0x4219147B;
+		R[RA] = 0x64;
 		R[RB] = 0x42357AE1;
 		//dump(1094713344);
 		cod_inst = MUE_REG_BUS;
 		orig = RA;
 		dest = ALU_B1;
 		ejecuta();
+		for (int i=0;i<=20;i++ ) {
+			RAM[i] = (byte)0x00;
+		}
+		RAM[10] = (byte)0xDB;
+		RAM[11] = (byte)0x57;
+		RAM[12] = (byte)0xB7;
+		RAM[13] = (byte)0xBC;
+		RAM[14] = (byte)0x77;
+		RAM[15] = (byte)0xBB;
+
+		R[BP] = 0x41200000;
+		R[IP] = 0x00000000;
+		capta();
+		traduce();
 		dump(1094713344);
 		/*cod_inst = MUE_REG_BUS;
 		orig = RB;
 		dest = ALU_B2;
 		ejecuta();*/
-		System.out.println("REG A: "+R[RA]+", REG IX: "+R[IX]);
+		//System.out.println("REG A: "+R[RA]+", REG IX: "+R[IX]);
 	}
 }
