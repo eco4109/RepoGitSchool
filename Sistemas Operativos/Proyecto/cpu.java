@@ -48,9 +48,12 @@ public class cpu{
 	// int = 4 byte´s
 	// 1Mb de RAM
 	public static byte[] RAM = new byte[1048576]; 
-	//Buffer Arrays
+	//Buffer Arrays contains BYTES
 	public static byte[] r2b = new byte[2];
 	public static byte[] r4b = new byte[4];
+	//Buffer Arrays, contains bits in each position
+	public static String[] r2binary = new String[2];
+	public static String[] r4binary = new String[4];
 
 	static int cod_inst = 0;
 	static int orig; 
@@ -70,21 +73,34 @@ public class cpu{
 		return nada;
 	}
 
-	public static void printArray(byte[] array){
-		//Print Array Function
+	public static void printArrayinDec(byte[] array){ //Function for print an Array in decimal, a BYTE comes in
 		for (int i=0;i<array.length;i++) {
-			System.out.print(array[i]+", ");
+			System.out.println(array[i]&0xFF);
 		}
+	}
+
+	public static void printArray(String[] array){ //Function for print an Array, a STRING comes in
+		for (int i=0;i<array.length;i++) {
+			System.out.println(array[i]);
+		}
+	}
+
+	public static String bytes_to_bits(Byte stringBytes){ //Method for convert BYTES into bits String
+		String bb = Integer.toBinaryString(r2b[0]); //First the BYTE it´s convert into a String
+		String inBinary = bb.substring(bb.length()-8, bb.length());//Split the String , we need only the lasts 8 bits, so cut it
+		return inBinary;
 	}
 
 	public static void capta(){ //Lee byte´s guardados en la memoria RAM
 		//Creacion de los buffers de lectura
 
-		System.out.println("El registro IP, contiene (en flotante): "+R[0]);
-		System.out.println("El registro BP, contiene (en flotante): "+R[6]);
+		System.out.println("El registro IP, contiene (en flotante): "+IEEE_a_flotante(R[6]));
+		System.out.println("El registro BP, contiene (en flotante): "+IEEE_a_flotante(R[3]));
 		//Suma de los Valores contenidos en el registro IP e IB
-		int direcMem = R[6] + R[0]; //R[6], es IP R[3] es IB, o al revés NO RECUERDO BIEN JEJE
-		System.out.println("La suma de BP + IP da: "+direcMem);
+		System.out.println("Se va a leer en la RAM desde :"+IEEE_a_flotante(R[6]));
+
+		float direcMem2 = IEEE_a_flotante(R[6]) + IEEE_a_flotante(R[0]); //R[6], es IP R[3] es IB, o al revés NO RECUERDO BIEN JEJE
+		int direcMem = (int) direcMem2;
 		//Leer 6 bytes de la "RAM" a partir de la posicion calculada+
 		//Guardar los primeros 2 bytes leidos en un buffer y los otros 4 en el otro 
 		for (int i=0;i<=5; i++) { //Ciclo para recorrer 6 bytes en la RAM a partir de la posicion IP + BP
@@ -96,11 +112,27 @@ public class cpu{
 		}
 	}
 
-	public static void traduce(){ //Function for translate bytes
-		printArray(r2b);
-		printArray(r4b);
-		
+	public static void traduce(){ 
+		System.out.println("Buffer de 2 bytes (En decimal)");
+		printArrayinDec(r2b);
+		System.out.println("Buffer de 4 bytes (En decimal)");
+		printArrayinDec(r4b);
+		//The buffers(Arrays) are full, now, we´ve to analizate them
+		//A method was created to convert the BYTE of the buffer to an 8-bit string
+		//A new buffer is created that contains in each position the 8-bit string 
+		for (int i=0;i<=5; i++) { //Loop for read each position of the arrays an convert the BYTES into BITS using the method that was created before called "bytes_to_bits"
+			if(i<2){
+				r2binary[i] = bytes_to_bits(r2b[i]); 
+			}else{
+				r4binary[i-2] = bytes_to_bits(r4b[i-2]);
+			}
+		}
+		System.out.println("2 bytes buffer (In binary)");
+		printArray(r2binary);
+		System.out.println("4 bytes buffer (In binary)");
+		printArray(r4binary);
 
+		pausa();
 	}
 
 	public static float IEEE_a_flotante( int f){
@@ -242,6 +274,18 @@ public class cpu{
 		orig = RA;
 		dest = ALU_B1;
 		ejecuta();
+		for (int i=0;i<=20;i++ ) {
+			RAM[i] = (byte)0x00;
+		}
+		RAM[10] = (byte)0xDB;
+		RAM[11] = (byte)0x57;
+		RAM[12] = (byte)0xB7;
+		RAM[13] = (byte)0xBC;
+		RAM[14] = (byte)0x77;
+		RAM[15] = (byte)0xBB;
+
+		R[BP] = 0x41200000;
+		R[IP] = 0x00000000;
 		capta();
 		traduce();
 		dump(1094713344);
