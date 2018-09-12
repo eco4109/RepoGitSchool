@@ -208,7 +208,7 @@ public class cpu{
 				dato[1] = r4b[1]&0xFF;
 				dato[2] = r4b[2]&0xFF;
 				dato[3] = r4b[3]&0xFF;
-			}else{
+			}
 				System.out.println(R[IP]);
 
 			//Then .... we´ve to convert to FLOAT the IP ... add the LARGE and transform AGAIN into BYTE
@@ -225,7 +225,7 @@ public class cpu{
 			//Save the new value of IP
 			//R is a byte var
 
-			}
+			
 			
 			R[IP] = Integer.parseInt(sieeeArray,16);
 			System.out.println(R[IP]);			
