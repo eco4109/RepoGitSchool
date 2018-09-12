@@ -152,6 +152,14 @@ public class cpu{
 		return datos3;
 	}
 
+	public static String arrayUnion (String[] array){ //Function for join the elements of an array
+		String result ="";
+		for (int i=0;i<array.length;i++) {
+			result = result+array[i];
+		}
+		return result.toUpperCase();
+	}
+
 	public static void traduce(){ 
 		System.out.println("Buffer de 2 bytes (En decimal)");
 		printArrayinDec(r2b);
@@ -206,9 +214,11 @@ public class cpu{
 			//We call a function who´ll convert the FLOAT number INTO IEEE representation (HEXA)
 			String ieeeArray[] = float_to_IEEE(aux);
 			System.out.print("The new IP: ");
-			for (int k =0;k<ieeeArray.length;k++) {
-				System.out.print(ieeeArray[k]);
-			}
+			//Join the elements of an array in one single STRING
+			String sieeeArray = arrayUnion(ieeeArray);
+			System.out.println(sieeeArray);
+			//Save the new value of IP
+			R[3] = "0x"+sieeeArray;
 
 			pausa();
 			
