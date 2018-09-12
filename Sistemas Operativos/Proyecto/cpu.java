@@ -59,8 +59,12 @@ public class cpu{
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
 	
+
 	public static int[] data = new int[4];
 	static int dato;
+
+	public static int dato[];
+
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
