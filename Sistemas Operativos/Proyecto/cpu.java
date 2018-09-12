@@ -5,6 +5,7 @@
 */
 import java.io.*;
 
+
 public class cpu{
 	static final int MUE_REG_REG = 0;
 	static final int MUE_REG_BUS = 64;
@@ -131,25 +132,28 @@ public class cpu{
 		int numberI = Float.floatToIntBits(numberF);
 		//System.out.println("Ya convertido entero: "+numberI);
 		byte datos[] = new byte[4];
-		int datos2[] = new int[4];
+		String datos2[] = new String[4];
 		String datos3[] = new String[4];
 		datos[0] = (byte) (numberI>>> 24);
 		datos[1] = (byte) (numberI>>> 16);
 		datos[2] = (byte) (numberI>>> 8);
 		datos[3] = (byte) (numberI>>> 0);
 		//Transform into decimal
-		datos2[0] = datos[0]&0xFF;
-		datos2[1] = datos[1]&0xFF;
-		datos2[2] = datos[2]&0xFF;
-		datos2[3] = datos[3]&0xFF;
+
+		datos2[0] =String.format("%02x", datos[0]&0xFF);
+		datos2[1] = String.format("%02x", datos[1]&0xFF);
+		datos2[2] = String.format("%02x", datos[2]&0xFF);
+		datos2[3] = String.format("%02x", datos[3]&0xFF);
 		//transform into hexadecimal
-		datos3[0] = Integer.toHexString(datos2[0]);
+		/*datos3[0] = Integer.toHexString(datos2[0]);
 		datos3[1] = Integer.toHexString(datos2[1]);
 		datos3[2] = Integer.toHexString(datos2[2]);
-		datos3[3] = Integer.toHexString(datos2[3]);
-		//System.out.println("Ya en IEEE(HEXA): ");
+		datos3[3] = Integer.toHexString(datos2[3]);*/
+		for (int i = 0; i<4; i++){
+		System.out.println("Datos 2 en "+ i+":" + datos2[i]);
+		}//System.out.println("Ya en IEEE(HEXA): ");
 		//System.out.printf("%02X %02X %02X %02X\n",datos[0]&0xFF, datos[1]&0xFF, datos[2]&0xFF, datos[3]&0xFF);
-		return datos3;
+		return datos2;
 	}
 
 	public static String arrayUnion (String[] array){ //Function for join the elements of an array
@@ -205,11 +209,12 @@ public class cpu{
 				dato[2] = r4b[2]&0xFF;
 				dato[3] = r4b[3]&0xFF;
 			}
+			System.out.println(R[IP]);
 
 			//Then .... we´ve to convert to FLOAT the IP ... add the LARGE and transform AGAIN into BYTE
 			
 			//System.out.println("IP en bruto: "+R[3]);
-			float aux = (IEEE_a_flotante(R[3]) + large); //Once we´have the float, add the large
+			float aux = (IEEE_a_flotante(R[IP]) + large); //Once we´have the float, add the large
 			//System.out.println("En flotante: "+aux);
 			//We call a function who´ll convert the FLOAT number INTO IEEE representation (HEXA)
 			String ieeeArray[] = float_to_IEEE(aux);
@@ -218,6 +223,12 @@ public class cpu{
 			String sieeeArray = arrayUnion(ieeeArray);
 			System.out.println(sieeeArray);
 			//Save the new value of IP
+
+			//R is a byte var
+			R[IP] = Integer.parseInt(sieeeArray,16);
+			System.out.println(R[IP]);			
+			//R[3] =( "0x"+sieeeArray);
+
 
 			pausa();
 			
@@ -374,7 +385,7 @@ public class cpu{
 		RAM[15] = (byte)0xBB;
 
 		R[BP] = 0x41200000;
-		R[IP] = 0x00000000;
+		R[IP] = 0x0000001;
 		capta();
 		traduce();
 		dump(1094713344);
