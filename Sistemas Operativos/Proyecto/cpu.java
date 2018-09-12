@@ -223,6 +223,7 @@ public class cpu{
 			String sieeeArray = arrayUnion(ieeeArray);
 			System.out.println(sieeeArray);
 			//Save the new value of IP
+
 			//R is a byte var
 
 			
@@ -230,6 +231,7 @@ public class cpu{
 			R[IP] = Integer.parseInt(sieeeArray,16);
 			System.out.println(R[IP]);			
 			//R[3] =( "0x"+sieeeArray);
+
 
 			pausa();
 			
