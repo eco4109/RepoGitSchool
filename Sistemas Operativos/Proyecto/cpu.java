@@ -245,9 +245,20 @@ public class cpu{
 		return num;
 
 	}
+	public static int binary_to_int(String numero){
+		int num;
+		return num=Integer.parseInt(numero,2);
+	}
 
 	public static void ejecuta(){
 		switch(cod_inst){
+			case MUE_DATO_BUS: //conjunto de instrucciones de la arquitectura ISA
+				if (dest == ALU_B3 || dest==MMU_B3|| DEST == MEM_B2){
+					System.out.println("\7Corto circuito");
+					System.exit(4);
+				}
+				B[dest]=dato;
+				break;
 			case MUE_REG_REG:
 				R[dest] = R[orig];
 				break;
@@ -288,6 +299,10 @@ public class cpu{
 				res_alu = IEEE_a_flotante(B[ALU_B1])*IEEE_a_flotante(B[ALU_B2]);
 				B[ALU_B3] = flotante_a_IEEE(res_alu);
 				break;
+			case MUE_DATO_REG:
+				R[dest] = dato;
+				break;
+
 		}
 	}
 	public static int forceint( float f){
@@ -365,7 +380,7 @@ public class cpu{
 			}
 		}
 	}
-
+// dump instrution, instruction in user mode 
 	public static void main(String[] argumento) {
 		//dump(1105199104);
 		R[RA] = 0x64;
@@ -375,20 +390,28 @@ public class cpu{
 		orig = RA;
 		dest = ALU_B1;
 		ejecuta();
-		for (int i=0;i<=20;i++ ) {
+		for (int i=0;i<=1000;i++ ) {
 			RAM[i] = (byte)0x00;
 		}
-		RAM[10] = (byte)0x7B;
-		RAM[11] = (byte)0x57;
-		RAM[12] = (byte)0xB7;
-		RAM[13] = (byte)0xBC;
-		RAM[14] = (byte)0x77;
-		RAM[15] = (byte)0xBB;
+		RAM[0]=(byte)0x20;
+		RAM[1]=(byte)0x05;
+		RAM[2]=(byte)0x43;
+		RAM[3]=(byte)0x62;
+		RAM[4]=(byte)0x75;
+		RAM[5]=(byte)0x38;
+		RAM[6]=(byte)0x21;
+		RAM[7]=(byte)0x00;
+		RAM[8]=(byte)0x43;
+		RAM[9]=(byte)0x96;
+		RAM[10]=(byte)0x00;
+		RAM[11]=(byte)0x00;
+
 
 		R[BP] = 0x41200000;
 		R[IP] = 0x0000001;
 		capta();
 		traduce();
+		binary_to_int("0111");
 		dump(1094713344);
 		/*cod_inst = MUE_REG_BUS;
 		orig = RB;
