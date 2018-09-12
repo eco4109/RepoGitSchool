@@ -204,6 +204,10 @@ public class cpu{
 				dato[2] = r4b[2]&0xFF;
 				dato[3] = r4b[3]&0xFF;
 			}
+
+				System.out.println(R[IP]);
+
+
 			//Then .... we´ve to convert to FLOAT the IP ... add the LARGE and transform AGAIN into BYTE
 			//System.out.println("IP en bruto: "+R[3]);
 			float aux = (IEEE_a_flotante(R[IP]) + large); //Once we´have the float, add the large
@@ -216,6 +220,7 @@ public class cpu{
 			//Save the new value of IP
 			R[IP] = Integer.parseInt(sieeeArray,16); //Convert the HEXa (String) into decimal, IP has the vaue on decimal "12345678"
 			System.out.println(IEEE_a_flotante(R[IP]));
+
 
 			//Then..  obtain the vaue of Register OI and transform into FLOAT
 			float F = IEEE_a_flotante(R[OI]);
@@ -233,6 +238,15 @@ public class cpu{
 			System.out.println("El nible 2: "+niblee2);
 			//Convert this niblee's into DEC
 
+			//R is a byte var
+
+			
+			
+			R[IP] = Integer.parseInt(sieeeArray,16);
+			System.out.println(R[IP]);			
+			//R[3] =( "0x"+sieeeArray);
+
+
 						
 
 			pausa();
@@ -249,9 +263,20 @@ public class cpu{
 		return num;
 
 	}
+	public static int binary_to_int(String numero){
+		int num;
+		return num=Integer.parseInt(numero,2);
+	}
 
 	public static void ejecuta(){
 		switch(cod_inst){
+			case MUE_DATO_BUS: //conjunto de instrucciones de la arquitectura ISA
+				if (dest == ALU_B3 || dest==MMU_B3|| DEST == MEM_B2){
+					System.out.println("\7Corto circuito");
+					System.exit(4);
+				}
+				B[dest]=dato;
+				break;
 			case MUE_REG_REG:
 				R[dest] = R[orig];
 				break;
@@ -295,12 +320,14 @@ public class cpu{
 			case MUE_DATO_REG:
 				R[dest] = dato;
 				break;
+
 			case MUE_DATO_BUS:
 				
 				break;
 			case DUMP:
 				dump(dato);
 				break;
+
 		}
 	}
 	public static int forceint( float f){
@@ -378,7 +405,7 @@ public class cpu{
 			}
 		}
 	}
-
+// dump instrution, instruction in user mode 
 	public static void main(String[] argumento) {
 		//dump(1105199104);
 		R[RA] = 0x64;
@@ -391,6 +418,7 @@ public class cpu{
 		for (int i=0;i<=1000;i++ ) {
 			RAM[i] = (byte)0x00;
 		}
+
 		for (int i=0;i<=13;i++ ) {
 			R[i] = 0;
 		}
@@ -400,10 +428,26 @@ public class cpu{
 			ejecuta();
 		}
 
+		RAM[0]=(byte)0x20;
+		RAM[1]=(byte)0x05;
+		RAM[2]=(byte)0x43;
+		RAM[3]=(byte)0x62;
+		RAM[4]=(byte)0x75;
+		RAM[5]=(byte)0x38;
+		RAM[6]=(byte)0x21;
+		RAM[7]=(byte)0x00;
+		RAM[8]=(byte)0x43;
+		RAM[9]=(byte)0x96;
+		RAM[10]=(byte)0x00;
+		RAM[11]=(byte)0x00;
+
+
+
 		R[BP] = 0x41200000; //(10.0)
 		R[IP] = 0x40000000; //(2.0)
 		capta();
 		traduce();
+		binary_to_int("0111");
 		dump(1094713344);
 		/*cod_inst = MUE_REG_BUS;
 		orig = RB;
