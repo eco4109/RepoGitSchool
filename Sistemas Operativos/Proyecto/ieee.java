@@ -6,8 +6,11 @@ public class ieee{
 		byte datos[] = new byte[4];
 
 		if(numero[0].equals("f")){
+			System.out.println("En bruto: "+numero[1]);
 			float f = Float.parseFloat(numero[1]);
+			System.out.println("En flotante: "+f);
 			int num = Float.floatToIntBits(f);
+			System.out.println("En entero: "+num);
 
 			datos[0] = (byte) (num>>> 24);
 			datos[1] = (byte) (num>>> 16);
