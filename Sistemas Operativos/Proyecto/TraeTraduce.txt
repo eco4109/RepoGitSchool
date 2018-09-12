@@ -13,7 +13,7 @@ R[IP] = FADIC738 <-- Convertir a flotante, ambos = 357
 R[BP] =                                          = 1000
 
 Sumar los dos, osea, 1357, se lee a partier de la 1357 (ir a esa posicion en la RAM) SIEMPRE SE VAN A LEER 6 BYTES, los dos primeros se meten en el arreglo de 2 bytes y el resto 4 bytes se mete en el arreglo de 4 bytes.
-
+	
 
 ======================================================================================
 Código de traduce (canalización de 3 etapas): llena los 2 arreglos, trabajara con ellos
