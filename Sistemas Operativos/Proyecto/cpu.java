@@ -59,7 +59,7 @@ public class cpu{
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
 	
-	public static int[] dato = new int[4];
+	public static int dato[];
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
@@ -271,7 +271,7 @@ public class cpu{
 	public static void ejecuta(){
 		switch(cod_inst){
 			case MUE_DATO_BUS: //conjunto de instrucciones de la arquitectura ISA
-				if (dest == ALU_B3 || dest==MMU_B3|| DEST == MEM_B2){
+				if (dest == ALU_B3 || dest==MMU_B3|| dest == MEM_B2){
 					System.out.println("\7Corto circuito");
 					System.exit(4);
 				}
