@@ -55,7 +55,7 @@ public class cpu{
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
 	
-	static int dato
+	public static int[] dato = new int[4];
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
@@ -101,8 +101,8 @@ public class cpu{
 	public static void capta(){ //Lee byte´s guardados en la memoria RAM
 		//Creacion de los buffers de lectura
 
-		System.out.println("El registro IP, contiene (en flotante): "+IEEE_a_flotante(R[6]));
-		System.out.println("El registro BP, contiene (en flotante): "+IEEE_a_flotante(R[3]));
+		System.out.println("El registro IP, contiene (en flotante): "+IEEE_a_flotante(R[3]));
+		System.out.println("El registro BP, contiene (en flotante): "+IEEE_a_flotante(R[6]));
 		//Suma de los Valores contenidos en el registro IP e IB
 		System.out.println("Se va a leer en la RAM desde :"+IEEE_a_flotante(R[6]));
 
@@ -122,6 +122,34 @@ public class cpu{
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
 		int aux = Integer.parseInt(Character.toString(caracter));
 		return aux;
+	}
+
+	public static String[] float_to_IEEE(float numberF){ //Function for transform a FLOAT number into IEE
+		//Representation in HEXA, the diference between this and the teacher´s function is that this do all the procees
+		//Like the "ieee.java teacher´s code" but in one function
+		//System.out.println("Lo que entró (en flotante): "+ numberF);
+		int numberI = Float.floatToIntBits(numberF);
+		//System.out.println("Ya convertido entero: "+numberI);
+		byte datos[] = new byte[4];
+		int datos2[] = new int[4];
+		String datos3[] = new String[4];
+		datos[0] = (byte) (numberI>>> 24);
+		datos[1] = (byte) (numberI>>> 16);
+		datos[2] = (byte) (numberI>>> 8);
+		datos[3] = (byte) (numberI>>> 0);
+		//Transform into decimal
+		datos2[0] = datos[0]&0xFF;
+		datos2[1] = datos[1]&0xFF;
+		datos2[2] = datos[2]&0xFF;
+		datos2[3] = datos[3]&0xFF;
+		//transform into hexadecimal
+		datos3[0] = Integer.toHexString(datos2[0]);
+		datos3[1] = Integer.toHexString(datos2[1]);
+		datos3[2] = Integer.toHexString(datos2[2]);
+		datos3[3] = Integer.toHexString(datos2[3]);
+		//System.out.println("Ya en IEEE(HEXA): ");
+		//System.out.printf("%02X %02X %02X %02X\n",datos[0]&0xFF, datos[1]&0xFF, datos[2]&0xFF, datos[3]&0xFF);
+		return datos3;
 	}
 
 	public static void traduce(){ 
@@ -154,20 +182,34 @@ public class cpu{
 		}else{
 			//There isn't violation, so, transform the first BYTE of the 2-BYTES buffer into INT
 			cod_inst = r2b[0]&0xFF;
-			System.out.println("Intruction code: "+cod_inst);
+			System.out.println("Instruction code: "+cod_inst);
 			//Obtain the secod bit of the first BYTE, thats bit indicate the instruction safety
 			int S = char_to_int(r2binary[0].charAt(1)); 
 			System.out.println("S: "+S);
 			int L = char_to_int(r2binary[0].charAt(2)); 
 			System.out.println("L: "+L);
-			//Large calculate
+			//Calculating large
 			int large = 2 + L * 4;
-			System.out.println("Largo: "+large);
+			System.out.println("Large: "+large);
 			if(large == 6){ //If the large it's 6 fill the variable "dato" with the 4 BYTES of the second buffer
-				
-			}else{
-				
+				dato[0] = r4b[0]&0xFF; 
+				dato[1] = r4b[1]&0xFF;
+				dato[2] = r4b[2]&0xFF;
+				dato[3] = r4b[3]&0xFF;
 			}
+
+			//Then .... we´ve to convert to FLOAT the IP ... add the LARGE and transform AGAIN into BYTE
+			
+			//System.out.println("IP en bruto: "+R[3]);
+			float aux = (IEEE_a_flotante(R[3]) + large); //Once we´have the float, add the large
+			//System.out.println("En flotante: "+aux);
+			//We call a function who´ll convert the FLOAT number INTO IEEE representation (HEXA)
+			String ieeeArray[] = float_to_IEEE(aux);
+			System.out.print("The new IP: ");
+			for (int k =0;k<ieeeArray.length;k++) {
+				System.out.print(ieeeArray[k]);
+			}
+
 			pausa();
 			
 		}
