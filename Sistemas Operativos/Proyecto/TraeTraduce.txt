@@ -50,5 +50,9 @@ Esto es todo lo que hace el traductor de la canalización de 3 etapas.
 
 
 ========================================================================
+
+Implementar e que lee el binario.
+En google drive está el menu, implementarlo e el nuestro
+
  
 
