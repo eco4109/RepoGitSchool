@@ -1,3 +1,4 @@
+
 /*
 	Simulación de una computadora: CPU
 	20-Agosto-2018
@@ -59,7 +60,12 @@ public class cpu{
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
 	
+
+	public static int[] data = new int[4];
+	static int dato;
+
 	public static int dato[];
+
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
@@ -199,10 +205,10 @@ public class cpu{
 			int large = 2 + L * 4;
 			System.out.println("Large: "+large);
 			if(large == 6){ //If the large it's 6 fill the variable "dato" with the 4 BYTES of the second buffer
-				dato[0] = r4b[0]&0xFF; 
-				dato[1] = r4b[1]&0xFF;
-				dato[2] = r4b[2]&0xFF;
-				dato[3] = r4b[3]&0xFF;
+				data[0] = r4b[0]&0xFF; 
+				data[1] = r4b[1]&0xFF;
+				data[2] = r4b[2]&0xFF;
+				data[3] = r4b[3]&0xFF;
 			}
 
 				System.out.println(R[IP]);
@@ -229,25 +235,22 @@ public class cpu{
 			float newROI = S * (F+S*L); // 1 * (0+1*1) = 1
 			System.out.println("New OI in float: "+newROI);
 			R[OI] = flotante_a_IEEE(newROI);
-			System.out.println("New OI in dec: "+ R[OI]);
 			
 			//Then ... TAke the second byte of the 2-byte's buffer and split it into 2 nibles
 			String niblee1 = r2binary[0].substring(0,4);
 			String niblee2 = r2binary[0].substring(4,8);
-			System.out.println("El nible 1: "+niblee1);
-			System.out.println("El nible 2: "+niblee2);
+			System.out.println("Nible 1(binary): "+niblee1);
+			System.out.println("Nible 2(binary): "+niblee2);
 			//Convert this niblee's into DEC
-
-			//R is a byte var
-
-			
-			
+			int nible1 = binary_to_int(niblee1);
+			int nible2 = binary_to_int(niblee2);			
 			R[IP] = Integer.parseInt(sieeeArray,16);
-			System.out.println(R[IP]);			
-			//R[3] =( "0x"+sieeeArray);
-
-
-						
+			
+			//Then ... put the first nible into variabe "orig"
+			orig = nible1;
+			dest = nible2;
+			System.out.println("Orig(nible1 in dec): "+orig);
+			System.out.println("Dest(nible2 in dec): "+dest);
 
 			pausa();
 			
@@ -275,7 +278,7 @@ public class cpu{
 					System.out.println("\7Corto circuito");
 					System.exit(4);
 				}
-				B[dest]=dato;
+				R[dest]=dato;
 				break;
 			case MUE_REG_REG:
 				R[dest] = R[orig];
@@ -319,14 +322,7 @@ public class cpu{
 				break;
 			case MUE_DATO_REG:
 				R[dest] = dato;
-				break;
-
-			case MUE_DATO_BUS:
-				
-				break;
-			case DUMP:
-				dump(dato);
-				break;
+				break;			
 
 		}
 	}
@@ -407,52 +403,26 @@ public class cpu{
 	}
 // dump instrution, instruction in user mode 
 	public static void main(String[] argumento) {
-		//dump(1105199104);
 		R[RA] = 0x64;
 		R[RB] = 0x42357AE1;
-		//dump(1094713344);
 		cod_inst = MUE_REG_BUS;
 		orig = RA;
-		dest = ALU_B1;
+		dest = ALU_B2;
 		ejecuta();
-		for (int i=0;i<=1000;i++ ) {
+		for (int i=0;i<=20;i++ ) {
 			RAM[i] = (byte)0x00;
 		}
+		RAM[10] = (byte)0x7B;
+		RAM[11] = (byte)0x57;
+		RAM[12] = (byte)0xB7;
+		RAM[13] = (byte)0xBC;
+		RAM[14] = (byte)0x77;
+		RAM[15] = (byte)0xBB;
 
-		for (int i=0;i<=13;i++ ) {
-			R[i] = 0;
-		}
-		while(true){
-			capta();
-			traduce();
-			ejecuta();
-		}
-
-		RAM[0]=(byte)0x20;
-		RAM[1]=(byte)0x05;
-		RAM[2]=(byte)0x43;
-		RAM[3]=(byte)0x62;
-		RAM[4]=(byte)0x75;
-		RAM[5]=(byte)0x38;
-		RAM[6]=(byte)0x21;
-		RAM[7]=(byte)0x00;
-		RAM[8]=(byte)0x43;
-		RAM[9]=(byte)0x96;
-		RAM[10]=(byte)0x00;
-		RAM[11]=(byte)0x00;
-
-
-
-		R[BP] = 0x41200000; //(10.0)
-		R[IP] = 0x40000000; //(2.0)
+		R[BP] = 0x41200000;
+		R[IP] = 0x00000000;
 		capta();
 		traduce();
-		binary_to_int("0111");
 		dump(1094713344);
-		/*cod_inst = MUE_REG_BUS;
-		orig = RB;
-		dest = ALU_B2;
-		ejecuta();*/
-		//System.out.println("REG A: "+R[RA]+", REG IX: "+R[IX]);
 	}
 }
