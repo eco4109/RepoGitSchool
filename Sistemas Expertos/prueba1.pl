@@ -1,4 +1,4 @@
-padre(javier,xavier).
+﻿padre(javier,xavier).
 padre(andres,javier). 
 padre(andres,andreschico). 
 padre(andres,gabino). 
@@ -88,5 +88,5 @@ esposa(mary,rogelio).
 esposa(marce,andreschico).
 esposa(martha,javier).
 
-%Árbol genealogico de  Diego
+%Árbol genealogico de  Diego: 
 
