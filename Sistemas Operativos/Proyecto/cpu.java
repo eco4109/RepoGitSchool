@@ -64,7 +64,7 @@ public class cpu{
 	public static int[] data = new int[4];
 	static int dato;
 
-	public static int dato[];
+	//public static int dato[];
 
 	static int cod_inst = 0;
 	static int orig; 
@@ -407,10 +407,10 @@ public class cpu{
 		if(argumento.length!=0){
 			if(argumento[0].equals("BIOS"))
 				BIOS.IniciaBIOS();
-			if(argumento.length==2 && argumento[0].equeals("CreaDD")){
+			if(argumento.length==2 && argumento[0].equals("CreaDD")){
 				CrearDisco.creaHD(argumento[1]);
 			}
-			if(argumento.leng==3 && argumento[0].equals("CreaUSB")){
+			if(argumento.length==3 && argumento[0].equals("CreaUSB")){
 				CrearUSB.creaUSB(argumento[1],argumento[2]);
 			}
 			System.exit(0);
