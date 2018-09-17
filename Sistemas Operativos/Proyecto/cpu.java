@@ -403,15 +403,32 @@ public class cpu{
 	}
 // dump instrution, instruction in user mode 
 	public static void main(String[] argumento) {
+
+		if(argumento.length!=0){
+			if(argumento[0].equals("BIOS"))
+				BIOS.IniciaBIOS();
+			if(argumento.length==2 && argumento[0].equeals("CreaDD")){
+				CrearDisco.creaHD(argumento[1]);
+			}
+			if(argumento.leng==3 && argumento[0].equals("CreaUSB")){
+				CrearUSB.creaUSB(argumento[1],argumento[2]);
+			}
+			System.exit(0);
+
+		}
+
+
 		R[RA] = 0x64;
 		R[RB] = 0x42357AE1;
 		cod_inst = MUE_REG_BUS;
 		orig = RA;
 		dest = ALU_B2;
 		ejecuta();
-		for (int i=0;i<=20;i++ ) {
+		for (int i=0;i<=15;i++ ) {
 			RAM[i] = (byte)0x00;
 		}
+
+
 		RAM[10] = (byte)0x7B;
 		RAM[11] = (byte)0x57;
 		RAM[12] = (byte)0xB7;
@@ -424,5 +441,12 @@ public class cpu{
 		capta();
 		traduce();
 		dump(1094713344);
+
+
+		//for (int i = 0)
+
+
+
+
 	}
 }
