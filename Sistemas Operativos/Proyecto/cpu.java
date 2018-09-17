@@ -64,7 +64,11 @@ public class cpu{
 	public static int[] data = new int[4];
 	static int dato;
 
+<<<<<<< HEAD
 
+=======
+	//public static int dato[];
+>>>>>>> 3836eca5b81b894a8b426c95c328d6a80e23472c
 
 	static int cod_inst = 0;
 	static int orig; 
