@@ -118,6 +118,9 @@ madre(rosaura,eric).
 madre(rosaura,kenia).
 madre(rosaura,melisa).
 
+diego.
+jorge.
+
 hermana(valeria,diego).
 hermana(alma,isabel).
 hermana(isabel,alma).
