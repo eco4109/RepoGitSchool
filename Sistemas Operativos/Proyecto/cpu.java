@@ -64,7 +64,7 @@ public class cpu{
 	public static int[] data = new int[4];
 	static int dato;
 
-	public static int dato[];
+
 
 	static int cod_inst = 0;
 	static int orig; 
@@ -407,46 +407,15 @@ public class cpu{
 		if(argumento.length!=0){
 			if(argumento[0].equals("BIOS"))
 				BIOS.IniciaBIOS();
-			if(argumento.length==2 && argumento[0].equeals("CreaDD")){
+			if(argumento.length==2 && argumento[0].equals("CreaDD")){
 				CrearDisco.creaHD(argumento[1]);
 			}
-			if(argumento.leng==3 && argumento[0].equals("CreaUSB")){
+			if(argumento.length==3 && argumento[0].equals("CreaUSB")){
 				CrearUSB.creaUSB(argumento[1],argumento[2]);
 			}
 			System.exit(0);
 
 		}
-
-
-		R[RA] = 0x64;
-		R[RB] = 0x42357AE1;
-		cod_inst = MUE_REG_BUS;
-		orig = RA;
-		dest = ALU_B2;
-		ejecuta();
-		for (int i=0;i<=15;i++ ) {
-			RAM[i] = (byte)0x00;
-		}
-
-
-		RAM[10] = (byte)0x7B;
-		RAM[11] = (byte)0x57;
-		RAM[12] = (byte)0xB7;
-		RAM[13] = (byte)0xBC;
-		RAM[14] = (byte)0x77;
-		RAM[15] = (byte)0xBB;
-
-		R[BP] = 0x41200000;
-		R[IP] = 0x00000000;
-		capta();
-		traduce();
-		dump(1094713344);
-
-
-		//for (int i = 0)
-
-
-
 
 	}
 }
