@@ -104,7 +104,6 @@ progenitor(martha,cecilia).
 progenitor(martha,xavier).
 progenitor(javier,cecilia).
 progenitor(javier,xavier).
-progenitor(martha,cecilia).
 progenitor(roge,july).
 progenitor(mary,july).
 progenitor(roge,rogelito).
@@ -124,6 +123,14 @@ progenitor(juana,raul).
 progenitor(juana,andreschico).
 progenitor(marcelina,andrea).
 progenitor(andreschico,andrea).
+progenitor(paula,roge).
+progenitor(paula,martha).
+progenitor(paula,alis).
+progenitor(benja,martha).
+progenitor(benja,roge).
+progenitor(benja,juan).
+progenitor(benja,isma).
+progenitor(paula,isma).
 
 
 
@@ -164,24 +171,19 @@ padre(X,Y):-hombre(X),progenitor(X,Y). %Por ejemplo, aqui, en la consola se quie
 madre(X,Y):-mujer(X),progenitor(X,Y).
 hijo(X,Y):-hombre(X),progenitor(Y,X).
 hija(X,Y):-mujer(X),progenitor(Y,X).
+hermanos(X,Y):-progenitor(Z,X),progenitor(Z,Y).
 hermano(X,Y):-hombre(X),hermanos(X,Y).
 hermana(X,Y):-mujer(X),hermanos(X,Y).
 esposo(X,Y):-pareja(X,Y),hombre(X).
 esposa(X,Y):-pareja(X,Y),mujer(X).
-suegro(X,Y):-padre(X,Z),pareja(Y,Z).
-suegra(X,Y):-madre(X,Z),esposos(Y,Z).
-yerno(X,Y):-suegro(Y,X);suegra(Y,X),hombre(X).
-nuera(X,Y):-suegro(Y,X);suegra(Y,X),mujer(X).
-cunado(X,Y):-cunados(X,Y),hombre(X).
-cunada(X,Y):-cunados(X,Y),mujer(X).
 abuelo(X,Y):-progenitor(Z,Y),padre(X,Z).
 abuela(X,Y):-progenitor(Z,Y),madre(X,Z).
 nieto(X,Y):-progenitor(Y,Z),progenitor(Z,X),hombre(X).
 nieta(X,Y):-progenitor(Y,Z),progenitor(Z,X),mujer(X).
 tio(X,Y):-progenitor(Z,Y),(hermano(X,Z);cunado(X,Z)).
 tia(X,Y):-progenitor(Z,Y),(hermana(X,Z);cunada(X,Z)).
-primo(X,Y):-progenitor(Z,X),progenitor(W,Y),hermanos(Z,W),hombre(X).
-prima(X,Y):-progenitor(Z,X),progenitor(W,Y),hermanos(Z,W),mujer(X).
+primo(X,Y):-progenitor(Z,X),progenitor(W,Y),hermanos(Z,W).
+prima(X,Y):-progenitor(Z,X),progenitor(W,Y),hermanos(Z,W).
 
 
 
