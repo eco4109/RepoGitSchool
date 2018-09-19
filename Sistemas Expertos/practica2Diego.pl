@@ -173,17 +173,19 @@ hijo(X,Y):-hombre(X),progenitor(Y,X).
 hija(X,Y):-mujer(X),progenitor(Y,X).
 hermanos(X,Y):-progenitor(Z,X),progenitor(Z,Y).
 hermano(X,Y):-hombre(X),hermanos(X,Y).
-hermana(X,Y):-mujer(X),hermanos(X,Y).
+hermana(X,Y):-mujer(X),hermaqanos(X,Y).
 esposo(X,Y):-pareja(X,Y),hombre(X).
 esposa(X,Y):-pareja(X,Y),mujer(X).
 abuelo(X,Y):-progenitor(Z,Y),padre(X,Z).
 abuela(X,Y):-progenitor(Z,Y),madre(X,Z).
 nieto(X,Y):-progenitor(Y,Z),progenitor(Z,X),hombre(X).
 nieta(X,Y):-progenitor(Y,Z),progenitor(Z,X),mujer(X).
-tio(X,Y):-progenitor(Z,Y),(hermano(X,Z);cunado(X,Z)).
-tia(X,Y):-progenitor(Z,Y),(hermana(X,Z);cunada(X,Z)).
+tio(X,Y):-progenitor(W,Y),hermanos(X,W);esposa(Z,X),hermanos(Z,W).
+tixs(X,Y):-progenitor(Z,Y),hermanos(X,Z).
+tia(X,Y):-progenitor(Z,Y),(hermana(X,Z));esposo(Z,X),hermanos(Z,W).
 primo(X,Y):-progenitor(Z,X),progenitor(W,Y),hermanos(Z,W).
 prima(X,Y):-progenitor(Z,X),progenitor(W,Y),hermanos(Z,W).
+
 
 
 
