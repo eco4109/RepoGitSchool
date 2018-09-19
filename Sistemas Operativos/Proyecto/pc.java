@@ -434,14 +434,6 @@ public class pc{
 
 		}
 		BIOS.VerifDispo();
-		BIOS.StartUP();
-		//HAcer prorama para hacer de arranue un disco duro
-		//Abir el dico duro y prener el PRIMER BIT DEL SEGUNDO NIBLEE DEL ULTIMO BYTE, osea 0100 --0-000 ese
-		//con un OR  con la mascara 00001000 que es en 08 (en hexadecimal)
-		//Leer el byte 4 y hacerle un OR con el numero 08 y volver a escrbir en ese lugar 
-		//Se cambio en bit entonces ya es el disco duro de arranque.
-
-		//Mientras nos paso un disco duro ya booteable. 
 
 	}
 }
