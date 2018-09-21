@@ -1,8 +1,11 @@
 /**
 *************************************************************
 * @file servtcp.c
+
+
 * @brief Breve descripción
-* Ejemplo de un cliente TCP usando threads
+
+* Ejemplo de asasn cliente TCP usando threads
 *
 *
 * @author Gaspar Fernández <blakeyed@totaki.com>

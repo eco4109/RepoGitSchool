@@ -31,12 +31,12 @@ void getIpAddress(){ //Function for get the IP address of this machine
 
 int main(){
 
-	printf("\n\n\n\t=============================  WELCOME :D  =============================\n\n" );
+	printf("\n\n\n\t=============================  WELCOME :D (Server)  =============================\n\n");
 	//Initializing some things ..
-  	char * idPort;
+  	char * idPort = "5555";
   	int conexion_servidor, conexion_cliente, port; //declaramos las variables
-  	printf("\tSet the ID of my connection port:  ");
-  	scanf("%s", idPort);
+  	//printf("\tSet the ID of my connection port:  ");
+  	//scanf("%s", idPort);
   	printf("\tI'm starting ... ... ... \n\n");
   	getIpAddress(); //get The IP of this machine
 
@@ -60,22 +60,34 @@ int main(){
 	printf("\tI'm listening in the port:  --->  %d\n\n", ntohs(servidor.sin_port));
 	printf("\tNow, I'll wait for somebody ...\n" );
 	longc = sizeof(cliente); //Asignamos el tamaño de la estructura a esta variable
-	conexion_cliente = accept(conexion_servidor, (struct sockaddr *)&cliente, &longc); //Esperamos una conexion
-	if(conexion_cliente<0){
-		printf("Error al aceptar trafico\n");
-		close(conexion_servidor);
-	    return 1;
+	int noConexiones = 0;
+
+	while(noConexiones < 1){
+		noConexiones ++;
+		conexion_cliente = accept(conexion_servidor, (struct sockaddr *)&cliente, &longc); //Esperamos una conexion
+		if(conexion_cliente<0){
+			printf("Error al aceptar trafico\n");
+			close(conexion_servidor);
+	    	return 1;
+		}
+		printf("\tI'm conected with:  %s, through the port: %d\n", inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
 	}
-	printf("Conectando con %s:%d\n", inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
+	
+	printf("\n\n\n\t=============================  CHAT :D (Server)  =============================\n\n");
 	if(recv(conexion_cliente, buffer, 100, 0) < 0){ //Comenzamos a recibir datos del cliente
 	    //Si recv() recibe 0 el cliente ha cerrado la conexion. Si es menor que 0 ha habido algún error.
 	    printf("Error al recibir los datos\n");
 	    close(conexion_servidor);
 	    return 1;
 	}else{
-		printf("%s\n", buffer);
-	    bzero((char *)&buffer, sizeof(buffer));
-	    send(conexion_cliente, "Recibido\n", 13, 0);
+		while(buffer != "chao"){
+			printf("\t- %s says: %s\n",inet_ntoa(cliente.sin_addr), buffer);
+	    	bzero((char *)&buffer, sizeof(buffer));	
+	    	printf("\t- You: ");
+	    	scanf("%s",buffer);
+	    	send(conexion_cliente, buffer,100,0);
+	    	bzero(buffer,100);
+		}
 	}
 	close(conexion_servidor);
 }
