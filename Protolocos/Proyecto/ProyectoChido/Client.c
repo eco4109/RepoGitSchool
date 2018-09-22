@@ -15,6 +15,11 @@ int main(){
   scanf("%s", ipAddress);
   printf("\tEnter the ID PORT of the Server, plox: ");
   scanf("%s", idPortC);
+  char * idPortC = "5555";
+  printf("\tEnter the IP address of the Server, plox: ");
+  scanf("%s", ipAddress);
+  //printf("\tEnter the ID PORT of the Server, plox: ");
+  //scanf("%s", idPortC);
   printf("\tThe IP is: : %s\n",ipAddress);
   printf("\tThe port is: %s\n",idPortC);
   /*if(argc<2){
@@ -43,18 +48,27 @@ int main(){
 
   //cliente.sin_addr = *((struct in_addr *)servidor->h_addr); //<--para empezar prefiero que se usen
   //inet_aton(argv[1],&cliente.sin_addr); //<--alguna de estas dos funciones
+  printf("\n\tTrying to reach the server %s, through the port %d\n",inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
   if(connect(conexion,(struct sockaddr *)&cliente, sizeof(cliente)) < 0){ //conectando con el host
     printf("Error conectando con el host\n");
     close(conexion);
     return 1;
   }
-  printf("Conectado con %s:%d\n",inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
+  //printf("\tI'm conected with %s, trought the port: %d\n",inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
+  printf("\tI'm conected with %s, through the port: %d :)\n",inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
+  printf("\n\n\n\t=============================  CHAT :D (Client)  =============================\n\n");
+  //Aqui empieza el chat entre las computadoras
   //inet_ntoa(); está definida en <arpa/inet.h>
-  printf("Escribe un mensaje: ");
-  fgets(buffer, 100, stdin);
-  send(conexion, buffer, 100, 0); //envio
-  bzero(buffer, 100);
-  recv(conexion, buffer, 100, 0); //recepción
-  printf("%s", buffer);
+  printf("\t- You: ");
+  scanf("%s", buffer);
+  //fgets(buffer, 100, stdin);
+
+  while(buffer != "chao"){
+  	send(conexion, buffer, 100, 0); //envio
+  	bzero(buffer, 100);
+  	recv(conexion, buffer, 100, 0); //recepción
+  	printf("%s", buffer);
+  }  
+
 return 0;
 }

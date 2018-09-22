@@ -50,6 +50,7 @@ int main(){
 	servidor.sin_family = AF_INET; //asignamos a la estructura
 	servidor.sin_port = htons(port);
 	servidor.sin_addr.s_addr = INADDR_ANY; //esta macro especifica nuestra dirección
+
 	if(bind(conexion_servidor, (struct sockaddr *)&servidor, sizeof(servidor)) < 0){ //asignamos un puerto al socket
 		printf("Error al asociar el puerto a la conexion\n");
 		close(conexion_servidor);
@@ -60,17 +61,28 @@ int main(){
 	printf("\tI'm listening in the port:  --->  %d\n\n", ntohs(servidor.sin_port));
 	printf("\tNow, I'll wait for somebody ...\n" );
 	longc = sizeof(cliente); //Asignamos el tamaño de la estructura a esta variable
-	int noConexiones = 0;
+	int noConexiones = 0; //VAriable auxiliar para contar cuantas conexiones hay
+	struct sockaddr_in ArraydeConexiones[4]; //Array de conexiones cada posicion es una conexion :D con determinada estructura
+	int i = 0; //VAriable para recorrer e vector de conexiones
 
-	while(noConexiones < 1){
-		noConexiones ++;
+	printf("\n\n\n\t=============================  FASE DE CONEXIONES :D (Server)  =============================\n\n");
+	while(noConexiones < 1){ //Empieza e cclo para establecer las conexiones
+		printf(" \n\t... \n");
+		//Se acepta alguna conexion y se guarda en "cliente" OJO, NO se guarda en "conexion_clente"
+		//eso es por que a funcion "accept" regresa un 0 si NO se ha hecho la conexion bien
 		conexion_cliente = accept(conexion_servidor, (struct sockaddr *)&cliente, &longc); //Esperamos una conexion
+		ArraydeConexiones[i] = cliente; //Se guarda la conexion en este vector en la poscicion i
 		if(conexion_cliente<0){
 			printf("Error al aceptar trafico\n");
 			close(conexion_servidor);
 	    	return 1;
+		}else{
+			noConexiones = noConexiones + 1; //contador del numero de conexiones
+			//Se muestran los detalles de la conexion en pantalla
+			printf("\tI'm conected with:  %s, through the port: %d\n", inet_ntoa(ArraydeConexiones[i].sin_addr),htons(ArraydeConexiones[i].sin_port));
+			printf("\tHasta el momento hay : %d vatos(s) conectado(s)", noConexiones);
+			i = i +1; //Siguente posicion del vector de conexiones
 		}
-		printf("\tI'm conected with:  %s, through the port: %d\n", inet_ntoa(cliente.sin_addr),htons(cliente.sin_port));
 	}
 	
 	printf("\n\n\n\t=============================  CHAT :D (Server)  =============================\n\n");

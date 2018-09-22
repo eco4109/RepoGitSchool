@@ -66,12 +66,12 @@ int main(int argv, char** argc){
     socket_host = socket(AF_INET, SOCK_STREAM, 0);
     if(socket_host == -1)
       error(1, "No puedo inicializar el socket");
-    
+
     my_addr.sin_family = AF_INET ;
     my_addr.sin_port = htons(PORT);
     my_addr.sin_addr.s_addr = INADDR_ANY ;
 
-    
+
     if( bind( socket_host, (struct sockaddr*)&my_addr, sizeof(my_addr)) == -1 )
       error(2, "El puerto está en uso"); /* Error al hacer el bind() */
 
@@ -90,8 +90,8 @@ int main(int argv, char** argc){
 
     /* select() se carga el valor de tv */
     tv.tv_sec = 0;
-    tv.tv_usec = 500000;    /* Tiempo de espera */
-    
+    tv.tv_usec = 5000;    /* Tiempo de espera */
+
     if (select(socket_host+1, &rfds, NULL, NULL, &tv))
       {
         if((socket_client = accept( socket_host, (struct sockaddr*)&client_addr, &size_addr))!= -1)
@@ -112,7 +112,7 @@ int main(int argv, char** argc){
             exit(exitcode); /* Código de salida */
           default:  /* Somos proceso padre */
             childcount++; /* Acabamos de tener un hijo */
-            close(socket_client); /* Nuestro hijo se las apaña con el cliente que 
+            close(socket_client); /* Nuestro hijo se las apaña con el cliente que
                          entró, para nosotros ya no existe. */
             break;
           }
@@ -156,12 +156,12 @@ int DemasiadosClientes(int socket, struct sockaddr_in addr)
     int bytecount;
 
     memset(buffer, 0, BUFFERSIZE);
-    
+
     sprintf(buffer, "Demasiados clientes conectados. Por favor, espere unos minutos\n");
 
     if((bytecount = send(socket, buffer, strlen(buffer), 0))== -1)
       error(6, "No puedo enviar información");
-    
+
     close(socket);
 
     return 0;
@@ -229,7 +229,7 @@ int AtiendeCliente(int socket, struct sockaddr_in addr)
         code=99;        /* Salir del programa */
       }
     else
-      {     
+      {
         sprintf(aux, "ECHO: %s\n", buffer);
         strcpy(buffer, aux);
       }
