@@ -26,6 +26,8 @@ public class pc{
 	static final int DS = 11;
 	static final int IPR = 12;
 	static final int OI = 13;
+	static final int NOP = 5;
+	static final int COMP = 6;
 	static final int ALU_B1 = 0;
 	static final int ALU_B2 = 1;
 	static final int ALU_B3 = 2;
@@ -40,6 +42,8 @@ public class pc{
 	static final int ALU_DIV = 69;
 	static final int MUE_DATO_REG = 32;
 	static final int MUE_DATO_BUS = 96;
+	static final int SBAND = 49;
+
 
 	//Dispositivos y arranque del BIOS
 	public static String BOOT="0000";
@@ -59,7 +63,7 @@ public class pc{
 	public static int disp_ES=0;
 	
 
-	
+	static  byte buffer[] = new byte[128];
 	//Registros del CPU
 	public static int[] R = new int[14];
 	//Buses de todo el sistema (compuertas)
@@ -125,25 +129,19 @@ public class pc{
 		return inBinary;
 	}
 
-	public static void capta(){ //Lee byte´s guardados en la memoria RAM
-		//Creacion de los buffers de lectura
-
-		System.out.println("El registro IP, contiene (en flotante): "+IEEE_a_flotante(R[3]));
-		System.out.println("El registro BP, contiene (en flotante): "+IEEE_a_flotante(R[6]));
-		//Suma de los Valores contenidos en el registro IP e IB
-		System.out.println("Se va a leer en la RAM desde :"+IEEE_a_flotante(R[6]));
-
-		float direcMem2 = IEEE_a_flotante(R[6]) + IEEE_a_flotante(R[0]); //R[6], es IP R[3] es IB, o al revés NO RECUERDO BIEN JEJE
-		int direcMem = (int) direcMem2;
-		//Leer 6 bytes de la "RAM" a partir de la posicion calculada+
-		//Guardar los primeros 2 bytes leidos en un buffer y los otros 4 en el otro 
-		for (int i=0;i<=5; i++) { //Ciclo para recorrer 6 bytes en la RAM a partir de la posicion IP + BP
-			if(i<2){
-				r2b[i] = RAM[direcMem + i]; 
-			}else{
-				r4b[i-2] = RAM[direcMem + i];
-			}
-		}
+	public static void capta(){
+		int x=forceint(IEEE_a_flotante(R[BP]) + IEEE_a_flotante(R[IP]));
+		buff_trad[0]=RAM[x];
+		x++;
+		buff_trad[1]=RAM[x];
+		x++;
+		buff_dato[0]=RAM[x];
+		x++;
+		buff_dato[1]=RAM[x];
+		x++;
+		buff_dato[2]=RAM[x];
+		x++;
+		buff_dato[3]=RAM[x];
 	}
 
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
@@ -182,98 +180,43 @@ public class pc{
 		return result.toUpperCase();
 	}
 
-	public static void traduce(){ 
-		System.out.println("Buffer de 2 bytes (En decimal)");
-		printArrayinDec(r2b);
-		System.out.println("Buffer de 4 bytes (En decimal)");
-		printArrayinDec(r4b);
-		//The buffers(Arrays) are full, now, we´ve to analizate them
-		//A method was created to convert the BYTE of the buffer to an 8-bit string
-		//A new buffer is created that contains in each position the 8-bit string 
-		for (int i=0;i<=5; i++) { //Loop for read each position of the arrays an convert the BYTES into BITS using the method that was created before called "bytes_to_bits"
-			if(i<2){
-				r2binary[i] = bytes_to_bits(r2b[i]); 
-			}else{
-				r4binary[i-2] = bytes_to_bits(r4b[i-2]);
-			}
-		}
-		System.out.println("2 bytes buffer (In binary)");
-		printArray(r2binary);
-		System.out.println("4 bytes buffer (In binary)");
-		printArray(r4binary);
-		//Now we've other 2 Arrays with the instructions microcode in each position.
-		//Analizate them, starting for the first bit of all. Validation starts
-		//Transform the first bit of the firs BYTE in INTEGER
-		int erbit = char_to_int(r2binary[0].charAt(0));
-		//Obtain the value of the PSW
-		if((erbit==1)&&(PSW[15]==false)){
-			System.out.println("Kernel mode access violation");
+	public static void traduce(){
+	
+		int k = verificaValor(forceint(buff_trad[0]),1);
+		int s = verificaValor(forceint(buff_trad[0]),2);
+		int L = verificaValor(forceint(buff_trad[0]),3);
+		
+		 
+	
+		if(k==1 && (!PSW[15])){
+			System.out.println("\7 Violacion de Acceso al Modo Kernel");
 			System.exit(4);
-		}else{
-			//There isn't violation, so, transform the first BYTE of the 2-BYTES buffer into INT
-			cod_inst = r2b[0]&0xFF;
-			System.out.println("Instruction code: "+cod_inst);
-			//Obtain the secod bit of the first BYTE, thats bit indicate the instruction safety
-			int S = char_to_int(r2binary[0].charAt(1)); 
-			System.out.println("S: "+S);
-			int L = char_to_int(r2binary[0].charAt(2)); 
-			System.out.println("L: "+L);
-			//Calculating large
-			int large = 2 + L * 4;
-			System.out.println("Large: "+large);
-			if(large == 6){ //If the large it's 6 fill the variable "dato" with the 4 BYTES of the second buffer
-				data[0] = r4b[0]&0xFF; 
-				data[1] = r4b[1]&0xFF;
-				data[2] = r4b[2]&0xFF;
-				data[3] = r4b[3]&0xFF;
-			}
-
-				System.out.println(R[IP]);
-
-
-			//Then .... we´ve to convert to FLOAT the IP ... add the LARGE and transform AGAIN into BYTE
-			//System.out.println("IP en bruto: "+R[3]);
-			float aux = (IEEE_a_flotante(R[IP]) + large); //Once we´have the float, add the large
-			//System.out.println("En flotante: "+aux);
-			//We call a function who´ll convert the FLOAT number INTO IEEE representation (HEXA)
-			String ieeeArray[] = float_to_IEEE(aux);
-			System.out.print("The new IP: ");
-			//Join the elements of an array in one single STRING
-			String sieeeArray = arrayUnion(ieeeArray); //IP in HEXA (String)
-			//Save the new value of IP
-			R[IP] = Integer.parseInt(sieeeArray,16); //Convert the HEXa (String) into decimal, IP has the vaue on decimal "12345678"
-			System.out.println(IEEE_a_flotante(R[IP]));
-
-
-			//Then..  obtain the vaue of Register OI and transform into FLOAT
-			float F = IEEE_a_flotante(R[OI]);
-			System.out.println("Initial OI: "+F);
-			//CAlculate  the vaue of OI:
-			float newROI = S * (F+S*L); // 1 * (0+1*1) = 1
-			System.out.println("New OI in float: "+newROI);
-			R[OI] = flotante_a_IEEE(newROI);
-			
-			//Then ... TAke the second byte of the 2-byte's buffer and split it into 2 nibles
-			String niblee1 = r2binary[0].substring(0,4);
-			String niblee2 = r2binary[0].substring(4,8);
-			System.out.println("Nible 1(binary): "+niblee1);
-			System.out.println("Nible 2(binary): "+niblee2);
-			//Convert this niblee's into DEC
-			int nible1 = binary_to_int(niblee1);
-			int nible2 = binary_to_int(niblee2);			
-			R[IP] = Integer.parseInt(sieeeArray,16);
-			
-			//Then ... put the first nible into variabe "orig"
-			orig = nible1;
-			dest = nible2;
-			System.out.println("Orig(nible1 in dec): "+orig);
-			System.out.println("Dest(nible2 in dec): "+dest);
-
-			pausa();
-			
 		}
-	}
-
+		cod_inst=buff_trad[0];
+		int largo = 2+4*L;
+		int aux;
+		if(largo==6){
+			dato = 0;
+			aux = buff_dato[0];
+			aux = aux << 24;
+			dato = dato + aux;
+			aux = buff_dato[1];
+			aux =  (aux <<16)&0x00FF0000;
+			dato = dato + aux;
+			aux = buff_dato[2];
+			aux =  aux << 8;
+			dato = dato + aux;
+			aux = (buff_dato[3])&0x000000FF;
+			dato = dato + aux;
+		}
+		float j = IEEE_a_flotante(R[IP])+largo;
+		R[IP] = flotante_a_IEEE(j);
+		float f = IEEE_a_flotante(R[OI]);
+		float w = s*(f+s*largo);
+		R[OI]=flotante_a_IEEE(w);
+		orig = (buff_trad[1]&0xF0)>>>4;
+		dest = (buff_trad[1]&0xF);
+}
 	public static float IEEE_a_flotante( int f){
 		float yy = Float.intBitsToFloat((f));
 		return yy;
@@ -290,58 +233,102 @@ public class pc{
 
 	public static void ejecuta(){
 		switch(cod_inst){
-			case MUE_DATO_BUS: //conjunto de instrucciones de la arquitectura ISA
-				if (dest == ALU_B3 || dest==MMU_B3|| dest == MEM_B2){
-					System.out.println("\7Corto circuito");
-					System.exit(4);
-				}
-				R[dest]=dato;
-				break;
 			case MUE_REG_REG:
-				R[dest] = R[orig];
+				R[dest]=R[orig];
 				break;
 			case MUE_REG_BUS:
-				if(dest == ALU_B3 || dest == MMU_B3 || dest == MEM_B2){
-					System.out.println("\7Corto Circuito");
+				if(dest==ALU_B3||dest==MMU_B3||dest==MEM_B2){
+					System.out.println("\7 Corto circuito");
 					System.exit(4);
 				}
-				B[dest] = R[orig];
+				B[dest]=R[orig];
 				break;
 			case MUE_BUS_REG:
-				if(orig == MMU_B3){
-					System.out.println("\7Corto Circuito");
+				if(orig==MMU_B3){
+					System.out.println("\7 Corto Circuito");
 					System.exit(4);
 				}
-				R[dest] = B[orig];
+				R[dest]=B[orig];
 				break;
 			case MUE_BUS_BUS:
-				if(dest == ALU_B3 ||dest == MMU_B3 || dest== MEM_B2 ||orig == MMU_B2 || orig == MEM_B1){
+				if(dest==ALU_B3||dest==MMU_B3||dest==MEM_B2||orig==MMU_B3||orig==MEM_B1){
+					System.out.println("\7 Corto Circuito");
+					System.exit(4);
+				}
+				B[dest]=B[orig];
+				break;
+			case ALU_SUM:
+				res_alu=IEEE_a_flotante(B[ALU_B1])+IEEE_a_flotante(B[ALU_B2]);
+				B[ALU_B3]=flotante_a_IEEE(res_alu);
+				break;
+			case ALU_RES:
+				res_alu=IEEE_a_flotante(B[ALU_B1])-IEEE_a_flotante(B[ALU_B2]);
+				B[ALU_B3]=flotante_a_IEEE(res_alu);
+				break;
+			case ALU_MUL:
+				res_alu=IEEE_a_flotante(B[ALU_B1])*IEEE_a_flotante(B[ALU_B2]);
+				B[ALU_B3]=flotante_a_IEEE(res_alu);
+				break;
+			case ALU_DIV:
+				res_alu=IEEE_a_flotante(B[ALU_B1])/IEEE_a_flotante(B[ALU_B2]);
+				B[ALU_B3]=flotante_a_IEEE(res_alu);
+				break;
+			case MUE_DATO_REG:
+				R[dest]=dato;
+				break;
+			case DUMP:
+				dump(dato);
+				break;
+			case MUE_DATO_BUS:
+				if(dest==ALU_B3||dest==MMU_B3||dest==MEM_B2){
 					System.out.println("\7Corto Circuito");
 					System.exit(4);
 				}
-				B[dest] = B[orig];
+				B[dest]=dato;
 				break;
-			case ALU_SUM:
-				res_alu = IEEE_a_flotante(B[ALU_B1])+IEEE_a_flotante(B[ALU_B2]);
-				B[ALU_B3] = flotante_a_IEEE(res_alu);
+			case COMP:
+				for(int i=0;i<=14;i++){
+					PSW[i]=false;
+					float r1 = IEEE_a_flotante(R[orig]);
+					float r2 = IEEE_a_flotante(R[dest]);
+					if(r1==r2)
+						PSW[0]=true;
+					if(r1>r2)
+						PSW[1]=true;
+					if(r1<r2)
+						PSW[2]=true;
+					if(r1>=r2)
+						PSW[3]=true;
+					if(r1<=r2)
+						PSW[4]=true;
+					if(r1!=r2)
+						PSW[5]=true;
+				}
+				break;         
+                        case SBAND:
+                            if(PSW[orig]){
+                                R[dest]=dato;
+                            }
+                        case MMU_OPER:
+                            res_alu=IEEE_a_flotante(B[MMU_B1])+IEEE_a_flotante(B[MMU_B2]);
+                            if(forceint(res_alu)<=999&&!PSW[15]){
+                                System.out.println("\7Violacion de memoria");
+                                System.exit(4);
+                            }else
+                                B[MMU_B3]=flotante_a_IEEE(res_alu);
+                            break;
+                        case MMU_BY_PASS:
+                            temp1=forceint(IEEE_a_flotante(B[MMU_B2]));
+                            if(temp1<=999&&!PSW[15]){
+                                System.out.println("\7Violacion de memoria");
+                                System.exit(4);
+                            }else
+                                B[MMU_B3]=B[MMU_B2];
+                            break;
+			default:
 				break;
-			case ALU_RES:
-				res_alu = IEEE_a_flotante(B[ALU_B1])-IEEE_a_flotante(B[ALU_B2]);
-				B[ALU_B3] = flotante_a_IEEE(res_alu);
-				break;
-			case ALU_DIV:
-				res_alu = IEEE_a_flotante(B[ALU_B1])/IEEE_a_flotante(B[ALU_B2]);
-				B[ALU_B3] = flotante_a_IEEE(res_alu);
-				break;
-			case ALU_MUL:
-				res_alu = IEEE_a_flotante(B[ALU_B1])*IEEE_a_flotante(B[ALU_B2]);
-				B[ALU_B3] = flotante_a_IEEE(res_alu);
-				break;
-			case MUE_DATO_REG:
-				R[dest] = dato;
-				break;			
-
 		}
+		
 	}
 	public static int forceint( float f){
 		int valorEntero = (int) f;
@@ -433,7 +420,80 @@ public class pc{
 			System.exit(0);
 
 		}
+		
+		//escribeDisco();
+		//pausa();
 		BIOS.VerifDispo();
+		BIOS.StartUP();
+		for (int i=0; i<=45 ; i++) {
+			 System.out.printf("RAM[%d] = %02X\t",i,RAM[i]);
+		}
+
+		PSW[15] = true;
+		for (int i = 0; i<=13 ; i++) {
+		 	R[i] = 0;
+		 } 
+		 while(true){
+		 	dump(0);
+		 	capta();
+		 	traduce();
+		 	ejecuta();
+		 	pausa();
+		 	dump(0);
+		 	
+		 }
 
 	}
-}
+
+	public static void escribeDisco(){
+		buffer[0]=(byte)0x20;
+		buffer[1]=(byte)0x05;
+		buffer[2]=(byte)0x41;
+		buffer[3]=(byte)0xC4;
+		buffer[4]=(byte)0x00;
+		buffer[5]=(byte)0x00;
+		buffer[6]=(byte)0x20;
+		buffer[7]=(byte)0x07;
+		buffer[8]=(byte)0x41;
+		buffer[9]=(byte)0xB9;
+		buffer[10]=(byte)0x0A;
+		buffer[11]=(byte)0x3D;
+		buffer[12]=(byte)0x06;
+		buffer[13]=(byte)0x75;
+		buffer[14]=(byte)0x21;
+		buffer[15]=(byte)0x00;
+		buffer[16]=(byte)0x00;
+		buffer[17]=(byte)0x00;
+		buffer[18]=(byte)0x00;
+		buffer[19]=(byte)0x00;
+		buffer[20]=(byte)0x00;
+		buffer[21]=(byte)0x00;
+		escribe("DSK1.dsk",13);
+	}
+	public static void lee(String archivo, int pos){
+		try{
+			RandomAccessFile binfile = new RandomAccessFile(archivo, "rw");
+			binfile.seek(pos);
+			int bytes_leidos = binfile.read(buffer);
+			binfile.close();
+		}catch(IOException e){
+			System.out.print("No se pudo abrir el archivo");
+
+		}
+	}
+	public static void escribe(String Archivo, int pos){
+		try{
+			RandomAccessFile binfile = new RandomAccessFile(Archivo, "rw");
+			binfile.seek(pos);
+			binfile.write(buffer);
+			binfile.close();
+
+		} catch(IOException ex){
+			ex.printStackTrace();
+			System.out.println("\n\7 Fatal error");
+			System.exit(0);
+			}
+		}
+	}
+
+
