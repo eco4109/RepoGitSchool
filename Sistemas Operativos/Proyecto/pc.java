@@ -43,6 +43,9 @@ public class pc{
 	static final int MUE_DATO_REG = 32;
 	static final int MUE_DATO_BUS = 96;
 	static final int SBAND = 49;
+	static final int DUMP=33;
+	static final int MMU_OPER=70;
+    static final int MMU_BY_PASS=71;
 
 
 	//Dispositivos y arranque del BIOS
@@ -80,7 +83,8 @@ public class pc{
 	//Buffer Arrays, contains bits in each position
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
-	
+	static byte buff_trad[]= new byte[2];
+	static byte buff_dato[]= new byte[4];
 
 	public static int[] data = new int[4];
 	static int dato;
@@ -104,6 +108,40 @@ public class pc{
 		}
 		return nada;
 	}
+	public static int verificaValor(int valor, int num){
+		int masc1=128;
+		int masc2=64;
+		int masc3=32;
+		int R;
+		
+		if(num==1){
+			R = valor & masc1;
+			
+			if(R==128){
+				return 1;
+			}else{
+				return 0;
+			}
+		}else if(num==2){
+			R = valor & masc2;
+			if(R==64){
+				return 1;
+			}else{
+				return 0;
+			}
+		}else if(num==3){
+			R = valor & masc3;
+			if(R==32){
+				return 1;
+			}else{
+				return 0;
+			}
+		}else{
+			return 0;
+		}
+		
+	}
+	
 
 	public static void printArrayinDec(byte[] array){ //Function for print an Array in decimal, a BYTE comes in
 		for (int i=0;i<array.length;i++) {
