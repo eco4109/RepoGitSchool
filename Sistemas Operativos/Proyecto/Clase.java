@@ -41,7 +41,6 @@ public class Clase{
 		try{
 			FileInputStream fos = new FileInputStream(xArchivo(archivo));
 			fos.read(datos);
-			
 			fos.close();
 
 		}catch(IOException e){
