@@ -31,6 +31,7 @@ public class pc{
 	static final int ALU_B1 = 0;
 	static final int ALU_B2 = 1;
 	static final int ALU_B3 = 2;
+
 	static final int MMU_B1 = 3;
 	static final int MMU_B2 = 4;
 	static final int MMU_B3 = 5;
@@ -46,6 +47,12 @@ public class pc{
 	static final int DUMP=33;
 	static final int MMU_OPER=70;
     static final int MMU_BY_PASS=71;
+    static final int MEM_ESC_B=2;
+    static final int MEM_ESC_P=3;
+    static final int MEM_ESC_DP=4;
+    static final int MEM_LECT_B=72;
+    static final int MEM_LECT_P=73;
+    static final int MEM_LECT_DP=74;
 
 
 	//Dispositivos y arranque del BIOS
@@ -343,26 +350,59 @@ public class pc{
 						PSW[5]=true;
 				}
 				break;         
-                        case SBAND:
-                            if(PSW[orig]){
-                                R[dest]=dato;
-                            }
-                        case MMU_OPER:
-                            res_alu=IEEE_a_flotante(B[MMU_B1])+IEEE_a_flotante(B[MMU_B2]);
-                            if(forceint(res_alu)<=999&&!PSW[15]){
-                                System.out.println("\7Violacion de memoria");
-                                System.exit(4);
-                            }else
-                                B[MMU_B3]=flotante_a_IEEE(res_alu);
-                            break;
-                        case MMU_BY_PASS:
-                            temp1=forceint(IEEE_a_flotante(B[MMU_B2]));
-                            if(temp1<=999&&!PSW[15]){
-                                System.out.println("\7Violacion de memoria");
-                                System.exit(4);
-                            }else
-                                B[MMU_B3]=B[MMU_B2];
-                            break;
+            case SBAND:
+                   if(PSW[orig]){
+                       R[dest]=dato;
+                   }
+            case MMU_OPER:
+                   res_alu=IEEE_a_flotante(B[MMU_B1])+IEEE_a_flotante(B[MMU_B2]);
+                   if(forceint(res_alu)<=999&&!PSW[15]){
+                       System.out.println("\7Violacion de memoria");
+                       System.exit(4);
+                   }else
+                       B[MMU_B3]=flotante_a_IEEE(res_alu);
+                   break;
+            case MMU_BY_PASS:
+                   temp1=forceint(IEEE_a_flotante(B[MMU_B2]));
+                   if(temp1<=999&&!PSW[15]){
+                       System.out.println("\7Violacion de memoria");
+                       System.exit(4);
+                   }else
+                       B[MMU_B3]=B[MMU_B2];
+                   break;
+            case MEM_LECT_B:
+            	B[MEM_B2] = RAM[forceint(IEEE_a_flotante(MMU_B3))] & 0xFF;
+            	break;
+            case MEM_LECT_P:
+            	temp1 = forceint(IEEE_a_flotante(B[MMU_B3]));
+            	buff_dato[0] = (byte)0x00;
+            	buff_dato[1] = (byte)0x00;
+            	buff_dato[2] = RAM[temp1++];
+            	buff_dato[3] = RAM[temp1];
+            	B[MEM_B2] = ByteBuffer.wrap(buff_dato).getInt();
+            	break;
+            case MEM_LECT_DP:
+            	temp1 = forceint(IEEE_a_flotante(B[MMU_B3]));
+            	buff_dato[0] = RAM[temp1++];
+            	buff_dato[1] = RAM[temp1++];
+            	buff_dato[2] = RAM[temp1++];
+            	buff_dato[3] = RAM[temp1];
+            	break;
+            case MEM_ESC_B:
+            	RAM[forceint(IEEE_a_flotante(B[MMU_B3]))] = (byte)(B[MEM_B1]>>>0);
+            	break;
+            case MEM_ESC_P:
+		        temp2 = forceint(IEEE_a_flotante(B[MMU_B3]));
+		        RAM[temp2++]= (byte)(B[MEM_B1]>>>0);
+            	break;
+            case MEM_ESC_DP:
+            	temp2 = forceint(IEEE_a_flotante(B[MMU_B3]));
+            	RAM[temp2++] = (byte)(B[MEM_B1]>>>24);
+            	RAM[temp2++] = (byte)(B[MEM_B1]>>>16);
+            	RAM[temp2++] = (byte)(B[MEM_B1]>>>8);
+            	RAM[temp2] = (byte)(B[MEM_B1]>>>0);
+            	break;
+
 			default:
 				break;
 		}
@@ -459,7 +499,7 @@ public class pc{
 
 		}
 		
-		//escribeDisco();
+		escribeDisco();
 		//pausa();
 		BIOS.VerifDispo();
 		BIOS.StartUP();
@@ -484,28 +524,47 @@ public class pc{
 	}
 
 	public static void escribeDisco(){
-		buffer[0]=(byte)0x20;
-		buffer[1]=(byte)0x05;
-		buffer[2]=(byte)0x41;
-		buffer[3]=(byte)0xC4;
-		buffer[4]=(byte)0x00;
-		buffer[5]=(byte)0x00;
-		buffer[6]=(byte)0x20;
-		buffer[7]=(byte)0x07;
-		buffer[8]=(byte)0x41;
-		buffer[9]=(byte)0xB9;
-		buffer[10]=(byte)0x0A;
-		buffer[11]=(byte)0x3D;
-		buffer[12]=(byte)0x06;
-		buffer[13]=(byte)0x75;
-		buffer[14]=(byte)0x21;
-		buffer[15]=(byte)0x00;
-		buffer[16]=(byte)0x00;
-		buffer[17]=(byte)0x00;
-		buffer[18]=(byte)0x00;
-		buffer[19]=(byte)0x00;
-		buffer[20]=(byte)0x00;
-		buffer[21]=(byte)0x00;
+		RAM[0]=(byte)0x60;
+RAM[1]=(byte)0x06;
+RAM[2]=(byte)0xFE;
+RAM[3]=(byte)0xAD;
+RAM[4]=(byte)0xB1;
+RAM[5]=(byte)0xC7;
+RAM[6]=(byte)0x60;
+RAM[7]=(byte)0x04;
+RAM[8]=(byte)0x49;
+RAM[9]=(byte)0x55;
+RAM[10]=(byte)0xC2;
+RAM[11]=(byte)0x40;
+RAM[12]=(byte)0x47;
+RAM[13]=(byte)0x00;
+RAM[14]=(byte)0x0;
+RAM[15]=(byte)0x00;
+RAM[16]=(byte)0x21;
+RAM[17]=(byte)0x00;
+RAM[18]=(byte)0x49;
+RAM[19]=(byte)0x55;
+RAM[20]=(byte)0xC1;
+RAM[21]=(byte)0xE0;
+RAM[22]=(byte)0x00;
+RAM[23]=(byte)0x00;
+RAM[24]=(byte)0x00;
+RAM[25]=(byte)0x00;
+RAM[26]=(byte)0x00;
+RAM[27]=(byte)0x00;
+RAM[28]=(byte)0x00;
+RAM[29]=(byte)0x00;
+RAM[30]=(byte)0x00;
+RAM[31]=(byte)0x00;
+RAM[32]=(byte)0x00;
+RAM[33]=(byte)0x00;
+RAM[34]=(byte)0x00;
+RAM[35]=(byte)0x00;
+RAM[36]=(byte)0x00;
+RAM[37]=(byte)0x00;
+RAM[38]=(byte)0x00;
+RAM[39]=(byte)0x00;
+
 		escribe("DSK1.dsk",13);
 	}
 	public static void lee(String archivo, int pos){
