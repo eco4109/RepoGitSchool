@@ -571,6 +571,8 @@ public class pc{
 		RAM[36]=(byte)0x00;
 		RAM[37]=(byte)0x00;
 		RAM[38]=(byte)0x00;
+
+		
 		RAM[39]=(byte)0x00;
 		escribe("DSK1.dsk",13);
 	}
