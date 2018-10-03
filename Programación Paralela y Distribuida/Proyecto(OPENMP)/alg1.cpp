@@ -2,12 +2,11 @@
     Algoritmo No. 1
     SUMA EREW
 */
-#include<stdio.h>
-#include<math.h>
-#include<omp.h>
+#include <stdio.h>
+#include <math.h>
+#include <omp.h>
 
 int main(){ //Programa Principal
-    //int A[9]={0,1,1,1,1,1,1,1,1};
 	int i,j,k,n,eleva;
 
 	printf("\n\n\t--------------------  SUMA EREW  --------------------\n");
@@ -53,12 +52,11 @@ int main(){ //Programa Principal
             }
         }
             printf ( "\n" );
-            printf ( "[");
+            printf ( "\t[");
             for(k=1;k<=n;k++)        {
                 printf(" %d ",A[k]);
             }
             printf ( " ]");
       }
-      printf("\n\n\n\n\tEl resultado es: %d", A[n]);
-      printf ( "\n" );
+      printf("\n\n\n\tEl resultado es: %d\n", A[n]);
 }
