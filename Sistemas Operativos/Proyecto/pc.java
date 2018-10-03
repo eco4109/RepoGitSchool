@@ -5,6 +5,7 @@
 	Programa para simular el cpu de una computadora virtual
 */
 import java.io.*;
+import java.nio.*;
 
 
 public class pc{
@@ -495,12 +496,19 @@ public class pc{
 			if(argumento.length==3 && argumento[0].equals("CreaUSB")){
 				CrearUSB.creaUSB(argumento[1],argumento[2]);
 			}
+			if(argumento[0].equals("escribe")){
+				escribeDisco();
+
+				System.out.println("Escritura correctaa");
+				pausa();
+
+			}
 			System.exit(0);
 
 		}
 		
-		escribeDisco();
-		//pausa();
+		
+		
 		BIOS.VerifDispo();
 		BIOS.StartUP();
 		for (int i=0; i<=45 ; i++) {
@@ -525,46 +533,45 @@ public class pc{
 
 	public static void escribeDisco(){
 		RAM[0]=(byte)0x60;
-RAM[1]=(byte)0x06;
-RAM[2]=(byte)0xFE;
-RAM[3]=(byte)0xAD;
-RAM[4]=(byte)0xB1;
-RAM[5]=(byte)0xC7;
-RAM[6]=(byte)0x60;
-RAM[7]=(byte)0x04;
-RAM[8]=(byte)0x49;
-RAM[9]=(byte)0x55;
-RAM[10]=(byte)0xC2;
-RAM[11]=(byte)0x40;
-RAM[12]=(byte)0x47;
-RAM[13]=(byte)0x00;
-RAM[14]=(byte)0x0;
-RAM[15]=(byte)0x00;
-RAM[16]=(byte)0x21;
-RAM[17]=(byte)0x00;
-RAM[18]=(byte)0x49;
-RAM[19]=(byte)0x55;
-RAM[20]=(byte)0xC1;
-RAM[21]=(byte)0xE0;
-RAM[22]=(byte)0x00;
-RAM[23]=(byte)0x00;
-RAM[24]=(byte)0x00;
-RAM[25]=(byte)0x00;
-RAM[26]=(byte)0x00;
-RAM[27]=(byte)0x00;
-RAM[28]=(byte)0x00;
-RAM[29]=(byte)0x00;
-RAM[30]=(byte)0x00;
-RAM[31]=(byte)0x00;
-RAM[32]=(byte)0x00;
-RAM[33]=(byte)0x00;
-RAM[34]=(byte)0x00;
-RAM[35]=(byte)0x00;
-RAM[36]=(byte)0x00;
-RAM[37]=(byte)0x00;
-RAM[38]=(byte)0x00;
-RAM[39]=(byte)0x00;
-
+		RAM[1]=(byte)0x06;
+		RAM[2]=(byte)0xFE;
+		RAM[3]=(byte)0xAD;
+		RAM[4]=(byte)0xB1;
+		RAM[5]=(byte)0xC7;
+		RAM[6]=(byte)0x60;
+		RAM[7]=(byte)0x04;
+		RAM[8]=(byte)0x49;
+		RAM[9]=(byte)0x55;
+		RAM[10]=(byte)0xC2;
+		RAM[11]=(byte)0x40;
+		RAM[12]=(byte)0x47;
+		RAM[13]=(byte)0x00;
+		RAM[14]=(byte)0x0;
+		RAM[15]=(byte)0x00;
+		RAM[16]=(byte)0x21;
+		RAM[17]=(byte)0x00;
+		RAM[18]=(byte)0x49;
+		RAM[19]=(byte)0x55;
+		RAM[20]=(byte)0xC1;
+		RAM[21]=(byte)0xE0;
+		RAM[22]=(byte)0x00;
+		RAM[23]=(byte)0x00;
+		RAM[24]=(byte)0x00;
+		RAM[25]=(byte)0x00;
+		RAM[26]=(byte)0x00;
+		RAM[27]=(byte)0x00;
+		RAM[28]=(byte)0x00;
+		RAM[29]=(byte)0x00;
+		RAM[30]=(byte)0x00;
+		RAM[31]=(byte)0x00;
+		RAM[32]=(byte)0x00;
+		RAM[33]=(byte)0x00;
+		RAM[34]=(byte)0x00;
+		RAM[35]=(byte)0x00;
+		RAM[36]=(byte)0x00;
+		RAM[37]=(byte)0x00;
+		RAM[38]=(byte)0x00;
+		RAM[39]=(byte)0x00;
 		escribe("DSK1.dsk",13);
 	}
 	public static void lee(String archivo, int pos){
@@ -582,7 +589,7 @@ RAM[39]=(byte)0x00;
 		try{
 			RandomAccessFile binfile = new RandomAccessFile(Archivo, "rw");
 			binfile.seek(pos);
-			binfile.write(buffer);
+			binfile.write(RAM);
 			binfile.close();
 
 		} catch(IOException ex){
