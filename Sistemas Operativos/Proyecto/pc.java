@@ -54,6 +54,8 @@ public class pc{
     static final int MEM_LECT_B=72;
     static final int MEM_LECT_P=73;
     static final int MEM_LECT_DP=74;
+	static final int BANDON=192;
+	static final int BANDOFF=193;
 
 
 	//Dispositivos y arranque del BIOS
@@ -403,7 +405,12 @@ public class pc{
             	RAM[temp2++] = (byte)(B[MEM_B1]>>>8);
             	RAM[temp2] = (byte)(B[MEM_B1]>>>0);
             	break;
-
+			case BANDON:
+				PSW[orig] = true;
+				break;
+			case BANDOFF:
+				PSW[orig] = false;
+				break;
 			default:
 				break;
 		}
@@ -498,13 +505,10 @@ public class pc{
 			}
 			if(argumento[0].equals("escribe")){
 				escribeDisco();
-
 				System.out.println("Escritura correctaa");
 				pausa();
-
 			}
 			System.exit(0);
-
 		}
 		
 		
@@ -514,20 +518,19 @@ public class pc{
 		for (int i=0; i<=45 ; i++) {
 			 System.out.printf("RAM[%d] = %02X\t",i,RAM[i]);
 		}
-
 		PSW[15] = true;
 		for (int i = 0; i<=13 ; i++) {
 		 	R[i] = 0;
 		 } 
-		 while(true){
-		 	dump(0);
+		 while(!PSW[14]){
+		 	//dump(0);
 		 	capta();
 		 	traduce();
 		 	ejecuta();
-		 	pausa();
-		 	dump(0);
-		 	
+		 	//pausa();
+		 	//dump(0);
 		 }
+		 System.out.println("Termino la computadora virtual.");
 
 	}
 
@@ -571,8 +574,6 @@ public class pc{
 		RAM[36]=(byte)0x00;
 		RAM[37]=(byte)0x00;
 		RAM[38]=(byte)0x00;
-
-		
 		RAM[39]=(byte)0x00;
 		escribe("DSK1.dsk",13);
 	}
@@ -600,6 +601,4 @@ public class pc{
 			System.exit(0);
 			}
 		}
-	}
-
-
+}
