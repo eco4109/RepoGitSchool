@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include<omp.h>
+#include <omp.h>
+
 void oddEvenSplit(int L[],int odd[],int even[],int INI,int n){
    int cont1=1,cont2=1;
         for(int i=INI;i<=n;i++){
@@ -78,21 +79,38 @@ void mergeS(int L[],int ini,int n){
 
 
 int main(){
-    printf("\n					Ordenamiento EREW\n");
-	int i, j,x,n;
-	 int L[]={0,16,22,25,40,53,66,70,85,5,28,23,55,60,69,72,78};
-	 n=16;
-	printf("      \n  Vector Principal\n");
+    printf("\n\t--------------------  ORDENAMIENTO EREW  --------------------\n");
+    int i,j,x,n,l,eleva;
+    //Determinar el tamaño del vector
+    do{
+        printf("\n\tIngresa el tama%co del vector (Potencias de 2): ",164);
+        scanf("%d",&l); //Leyendo el número solicitado
+        if((l<2) && ((pow(2,log2(l))))!=l){
+            printf("\7");
+        }
+        int log = log2(l);
+        eleva = pow(2,log);
+    }while((l<2) || (eleva!=l)); //En la condicion delñ while se asegura de solo reci
+	
+	int L[l];
+	L[0] = 0;
+
+	for(int t =1; t<=l;t++){
+        printf("\n\tIngresa el valor numero %d: ",t);
+        scanf("%d",&L[t]); //Leyendo el número solicitado
+    }
+	n=log2(l);
+	printf("\n\n\tVector Incial: ");
 	printf ( "[");
-	for(i=0 ; i<n ; i++){
-		printf("    %d    ",L[i]);
+	for(i=1 ; i<=l ; i++){
+		printf("  %d  ",L[i]);
 	}
-    printf ( "]");
-    mergeS(L,1, n);
-    printf ("\nEL VECTOR ORDENADO ES: ");
+    printf ( "]\n");
+    mergeS(L,1, l);
+    printf ("\n\tVector Ordenado: ");
     printf ( "[");
-	for(i=0 ; i<n ; i++){
+	for(i=1 ; i<=l ; i++){
 		printf("    %d    ",L[i]);
 	}
-    printf ( "]");
+    printf ( "]\n\n");
 }
