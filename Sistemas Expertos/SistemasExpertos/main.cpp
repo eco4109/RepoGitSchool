@@ -24,6 +24,7 @@
 
 int estX=0, estY=0;
 int enteroX=0,enteroY=0;
+int coorX = 0, coorY=0;
 
 //Declaracion de funciones
 void creaTablero();
@@ -31,6 +32,7 @@ void pegaImagenAlpha();
 void cargaObstaculo();
 void creaObstaculos();
 void usarTexturaAlpha();
+void insertaObstaculos();
 //unsigned char * cargaObstaculo();
 
 
@@ -39,6 +41,8 @@ int mObstaculos[10][10];
 int yaSeGenero = 0;
 unsigned char * datos1[10];
 unsigned char * datos;
+
+
 
 void usarTexturaAlpha(unsigned char * dato,int alto,int ancho){
 
@@ -89,8 +93,14 @@ void moveMouse(int x,int y){
     //printf("x:%d\ty:%d\n",x,y);
     estX = (10*x)/400;
     estY = (20*y)/450;
-    enteroX = (estX/1) +1;
-    enteroY = estY/1;
+    if((estX/1) +1<=10 && estY/1<=10){
+        enteroX = (estX/1) +1;
+        enteroY = estY/1;
+    }else{
+        enteroX =10;
+        enteroY =10;
+    }
+
     //printf("EnteroX: %d, EnteroY: %d\n",enteroX,enteroY);
     glutPostRedisplay();
 
@@ -100,7 +110,7 @@ void creaObstaculos(){
     int coordenadaX = 0;
     int coordenadaY = 0;
     if (yaSeGenero==0){
-    for(int i=0; i<20;i++){
+    for(int i=0; i<10;i++){
         coordenadaX = rand() % 11;
         coordenadaY = rand() % 11;
         printf("Coordenadas que van a tener los 1s%d\t%d\n",coordenadaX,coordenadaY);
@@ -135,15 +145,11 @@ void mouse(int boton, int estado,int x,int y){
     if(boton == GLUT_LEFT_BUTTON && estado == GLUT_DOWN){
         printf("He hecho click");
         printf("Coordenadas(%d,%d)\n", enteroX,enteroY);
+        coorX = enteroX;
+        coorY = enteroY;
         //glPushMatrix();
         //glTranslatef(enteroX,enteroY, 0);
-         glPushMatrix();
-                glScalef(2,1,0);
-                glTranslatef(10,-10,0);
-                glScalef(.5,1,0);
-        pegaImagenAlpha("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\obstaculos.data",datos1[1],128,128);
-        //glPopMatrix();
-        glPopMatrix();
+
 
     }else if(boton == GLUT_LEFT_BUTTON){
 
@@ -165,6 +171,7 @@ void creaTablero(){
         glEnd();
         glPopMatrix();
     }
+    creaObstaculos();
 
 
     for(int i=2; i<24;i=i+2){
@@ -182,7 +189,7 @@ void creaTablero(){
         glEnd();
         glPopMatrix();
     }
-    printf("Vamo a ver");
+   // printf("Vamo a ver");
     //creaObstaculos();
 
 }
@@ -205,10 +212,7 @@ static void display(void){
 
     glClear(GL_COLOR_BUFFER_BIT);
     creaTablero();
-    glPushMatrix();
-
-
-    glPopMatrix();
+    insertaObstaculos();
     //glutPostRedisplay();
     glFlush();
 }
@@ -241,7 +245,24 @@ const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat high_shininess[] = { 100.0f };
 
 /* Program entry point */
+void insertaObstaculos(){
+    for(int i = 1; i<11;i++){
+        for(int j = 1; j<11; j++){
+            if (mObstaculos[i-1][j-1] == 1){
+                //printf("Las coordenadas son: %d,%d\n", i,j);
+                glPushMatrix();
+                    glScalef(2,1,0);
+                    glTranslatef(j-.7 ,-i,0);
+                    glScalef(.45,1.7,0);
+                    pegaImagenAlpha("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\obstaculos.data",datos1[i],128,128);
+                //glPopMatrix();
+                glPopMatrix();
 
+            }
+        }
+    }
+
+}
 int main(int argc, char *argv[])
 {
     glutInit(&argc, argv);
