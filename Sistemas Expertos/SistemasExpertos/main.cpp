@@ -51,6 +51,15 @@ const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
 const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
 const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat high_shininess[] = { 100.0f };
+
+
+/*puebas
+
+*/
+//char *str[5] = {"holi","perro","infeliz","comes","i,i"};
+
+
+
 unsigned char * leerImagen( const char * ruta,unsigned char * dato,int alto,int ancho){
     FILE *imagen;
     imagen=fopen(ruta,"r");
@@ -204,7 +213,7 @@ void creaObstaculos(){
 
         coordenadaY = rand() % 11;
         if (coordenadaX==1 && coordenadaY==1){coordenadaX = rand() % 11;coordenadaY = rand() % 11;}
-        if (coordenadaX==10 && coordenadaY==10  ){coordenadaX = rand() % 11;coordenadaY = rand() % 11;}
+        if (coordenadaX==10 && coordenadaY==10){coordenadaX = rand() % 11;coordenadaY = rand() % 11;}
         printf("Coordenadas: %d,%d\n",coordenadaX,coordenadaY);
         printf("Coordenadas que van a tener los 1s%d\t%d\n",coordenadaX,coordenadaY);
         mObstaculos[coordenadaX][coordenadaY] = 1;
