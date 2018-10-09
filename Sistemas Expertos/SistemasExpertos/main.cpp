@@ -17,14 +17,25 @@
 #else
 #include <GL/glut.h>
 #endif
-#include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
 #include <time.h>
 
-int estX=0, estY=0;
+int estX=0, estY=0, o=0;;
 int enteroX=0,enteroY=0;
 int coorX = 0, coorY=0;
 int posicionMonoX=0,posicionMonoY=0;
+int pos_depX = 0;
+int pos_depY = 0;
+int pos_preX = 9;
+int pos_preY = 9;
+float distancia2, distancia;
+//Vectores que guardan los movimientos que se van haciendo
+int VX[20];
+int VY[20];
+int iteracion;
 
 //Declaracion de funciones
 void creaTablero();
@@ -35,15 +46,19 @@ void usarTexturaAlpha();
 void insertaObstaculos();
 void insertaMono(int posMonoX,int posMonoY);
 void hazMovimiento();
+float calculaDistancia(int pos_depX,int pos_depY, int pos_preX, int pos_preY);
+char checarSentido(int pos_depX,int pos_depY);
+int regresaMov(char sentido, int pos_depX,int pos_depY);
 //unsigned char * cargaObstaculo();
+int calculaLoBueno();
 
 
-
-int mObstaculos[10][10];
+int mObstaculos[9][9];
 int yaSeGenero = 0;
 int movX=0,movY=0;
-int coordenadasX[]= {1,8,5,3,4,7,8,9,2,4,4,6,3,4};
-int coordenadasY[] = {1,9,4,2,4,6,3,8,2,1,7,8,9,5};
+int coordenadasX[] = {1};
+int coordenadasY[] = {1};
+int vectorCalculado = 0;
 
 unsigned char * datos1[10];
 unsigned char * mono;
@@ -210,15 +225,19 @@ void creaObstaculos(){
 
         coordenadaY = rand() % 11;
         if (coordenadaX==1 && coordenadaY==1){coordenadaX = rand() % 11;coordenadaY = rand() % 11;}
-        if (coordenadaX==10 && coordenadaY==10){coordenadaX = rand() % 11;coordenadaY = rand() % 11;}
+        if (coordenadaX==10 && coordenadaY==10){ coordenadaX = rand() % 11;coordenadaY = rand() % 11;}
         printf("Coordenadas: %d,%d\n",coordenadaX,coordenadaY);
         printf("Coordenadas que van a tener los 1s%d\t%d\n",coordenadaX,coordenadaY);
         mObstaculos[coordenadaX][coordenadaY] = 1;
+        mObstaculos[9][9] = 2;
+        mObstaculos[0][0] = 2;
+
+
 
 
     }
 
-    for(int i = 0; i<11;i++){
+    for(int i = 0; i<10;i++){
         for(int j = 0; j < 10; j++){
             if (mObstaculos[i][j] != 1){
                 mObstaculos[i][j] == 0;
@@ -226,11 +245,12 @@ void creaObstaculos(){
 
             }
         }
+
     }
 
     //imprimiendo lo que tiene la matriz
     for(int i = 0; i<10;i++){
-        for(int j = 0; j < 11; j++){
+        for(int j = 0; j < 10; j++){
             printf("%d\t",mObstaculos[i][j]);
         }
         printf("\n");
@@ -270,6 +290,7 @@ void creaTablero(){
         glPopMatrix();
     }
     creaObstaculos();
+    vectorCalculado = calculaLoBueno();
 
 
     for(int i=2; i<24;i=i+2){
@@ -314,10 +335,20 @@ static void display(void){
     glFlush();
 }
 static void key(unsigned char key, int x, int y){
+
     switch (key)
+
     {
-        case 27 :
-        break;
+        case 'a':
+            int salida = calculaLoBueno();
+            movX = coordenadasX[o];
+            movY = coordenadasY[o];
+            if(o == sizeof(coordenadasX)/4) o=0;
+            o = o+1;
+            printf("presione a: %d",o);
+            //return salida;
+            break;
+
     }
 
     glutPostRedisplay();
@@ -354,27 +385,172 @@ void insertaObstaculos(){
         glScalef(.5,.5,0);
         pegaImagenAlphaMono("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\ob.data",mono,128,128);
     glPopMatrix();
-    hazMovimiento();
+    //hazMovimiento();
 
 
 }
-void insertaMono(int posMonoX,int posMonoY){
-    glPushMatrix();
-        glScalef(2,2,1);
-        glTranslatef(posMonoX-1 ,-posMonoY-.6,0);
-        printf("Coordenadas del mono:%d,%d\n",posMonoX,posMonoY);
-        glScalef(.45,1.7,0);
-        pegaImagenAlphaMono("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\mon.data",mono,128,128);
-                //glPopMatrix();
-    glPopMatrix();
 
-}
+
+
 void hazMovimiento(){
     int longitud = sizeof(coordenadasX)/4;
-    for(int o=0; 0<longitud;0++){
 
-    }
 }
+float calculaDistancia(int pos_depX,int pos_depY, int pos_preX, int pos_preY){
+	float distancia;
+	//printf("Entro a la funcion: %d, %d, %d, %d ....\n",pos_depX, pos_depY, pos_preX, pos_preY );
+	distancia = sqrt((pow(pos_preX-pos_depX,2))+(pow(pos_preY-pos_depY,2))); //Formula para calcular la distancia
+	return distancia;
+}
+char checarSentido(int pos_depX,int pos_depY){
+	printf("Vienes de X: %d\n",pos_depX );
+	printf("Vienes de Y: %d\n",pos_depY );
+	//Se checara el sentido en el que se puede mover el depredador, en este orden especifico:
+	const char *orden[4] = {"Abajo", "Derecha", "Arriba", "Izquierda"};
+	char sentido;
+	for (int i = 0; i < 3; i++){
+		printf("Intento hacia: %s\n",orden[i] );
+		if(orden[i] == "Arriba"){ //Checar si s puede mover hacia arriba
+			printf("Entro arriba\n");
+			if(pos_depX == 0){ //Ya no se puede subir, FIN DEL TABLERO
+				continue;
+			}else{
+				if(mObstaculos[pos_depX-1][pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+					printf("\7");
+					continue;
+				}else{
+					//Si se puede mover hacia ARRIBA, regresar el sentido
+					sentido = 'U';
+					return sentido;
+				}
+			}
+		}else if(orden[i] == "Derecha"){
+			printf("Entro a la DERECHA\n");
+			if(pos_depY == 9){ //Ya no se puede ir a la DERECHA, FIN DEL TABLERO
+					continue;
+			}else{
+				if(mObstaculos[pos_depX][pos_depY+1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+					printf("\7");
+					continue;
+				}else{
+					//Si se puede mover hacia DERECHA, regresar el sentido
+					sentido = 'R';
+					return sentido;
+				}
+			}
+		}else if(orden[i] == "Izquierda"){
+			printf("Entro a la izquierda\n");
+			if(pos_depY == 0){ //Ya no se puede ir a la IZQUIERDA, FIN DEL TABLERO
+					continue;
+				}else{
+					if(mObstaculos[pos_depX][pos_depY-1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+						printf("\7");
+						continue;
+					}else{
+						//Si se puede mover hacia ARRIBA, regresar el sentido
+						sentido = 'L';
+						return sentido;
+					}
+				}
+		}else if(orden[i] == "Abajo"){
+			printf("Entro a  Abajo\n");
+			if(pos_depX == 9){ //Ya no se puede ir hacia abajo, FIN DEL TABLERO
+				continue;
+			}else{
+				if(mObstaculos[pos_depX +1][pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+					printf("\7");
+					continue;
+				}else{
+					//Si se puede mover hacia ABAJO, regresar el sentido
+					sentido = 'D';
+					return sentido;
+				}
+			}
+		}
+	}
+}
+int regresaMov(char sentido, int pos_depX,int pos_depY){
+	if(sentido == 'U'){ //Rgrsar hacia abajo
+		pos_depX = pos_depX - 1;
+	}else if(sentido == 'R'){ //Regresar a a izquerda
+		pos_depY = pos_depY - 1;
+	}else if(sentido == 'L'){ //Regresar a la derecha
+		pos_depY= pos_depY + 1;
+	}else if(sentido == 'D'){ //Regresar hacia arriba
+		pos_depX = pos_depX +1;
+	}
+}
+void imprimeVectoresMov(int VX[],int VY[], int i){
+	printf("Vector X: ");
+	for (int j = 0; j < i; j++){
+        coordenadasX[j] = VX[j];
+		printf("  %d  ", VX[j]);
+	}
+	printf("\n");
+	printf("Vector Y: ");
+	for (int j = 0; j < i; j++){
+	    coordenadasY[j] =VY[j];
+		printf("  %d  ", VY[j]);
+	}
+}
+
+int calculaLoBueno(){
+    if(vectorCalculado ==0){
+    distancia = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY); //Funcion para calcular la distancia ntre presa-depredado
+	printf("La distancia inicial entre el depredador y la presa es: %f\n", distancia);
+	if (distancia <=1){
+		printf("PRESA ALCANZADA CON EXITO\n");
+	}else{
+		int i = 0; //Variabler para TUS VECTORES XAVIIII
+		while(distancia>0){
+			getchar();
+			char sentido = checarSentido(pos_depX,pos_depY);
+			printf("Muevete hacia: %c\n",sentido );
+
+			if(sentido == 'U'){
+				pos_depX = pos_depX -1 ;
+				mObstaculos[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
+				mObstaculos[pos_depX+1][pos_depY] = 1;//Esro borra tu rastro para que no te sigan los malditos
+				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
+			}else if(sentido == 'R'){
+			//Mover hacia la derecha
+				pos_depY = pos_depY + 1;
+				mObstaculos[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
+				mObstaculos[pos_depX][pos_depY-1] = 1;
+			}else if(sentido == 'L'){
+				pos_depY = pos_depY - 1 ;
+				mObstaculos[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
+				mObstaculos[pos_depX][pos_depY+1] = 1;
+			}else if(sentido == 'D'){
+				pos_depX = pos_depX + 1;
+				mObstaculos[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
+				mObstaculos[pos_depX-1][pos_depY] = 1;
+			}
+			i++;
+			printf("Quedaste en X: %d\n", pos_depX);
+			printf("Quedaste en Y: %d\n", pos_depY);
+			//despliegaMAtriz();
+			distancia = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY);
+			printf("LA distancia es: %f\n",distancia );
+		}
+		printf("PRESA ALCANZADA CON EXITO\n");
+		//printf("Vectores de movimiento XV y XY\n");
+		//imprimeVectoresMov(VX,VY,i);
+	}
+    vectorCalculado=1;
+	return 1;
+	}
+
+}
+
 int main(int argc, char *argv[]){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB |GLUT_SINGLE);
