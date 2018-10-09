@@ -37,8 +37,7 @@ char checarSentido(int pos_depX,int pos_depY){
 			if(pos_depY == 0){ //Ya no se puede subir, FIN DEL TABLERO
 				continue;
 			}else{
-				pos_depY = pos_depY -1 ; //Subir una casilla arriba
-				if(A[pos_depY][pos_depX] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+				if(A[pos_depX][pos_depY-1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
 					printf("\7");
 					continue;
 				}else{
@@ -52,12 +51,11 @@ char checarSentido(int pos_depX,int pos_depY){
 			if(pos_depY == 9){ //Ya no se puede ir a la DERECHA, FIN DEL TABLERO
 					continue;
 			}else{
-				pos_depY = pos_depY + 1; //ir una casilla DERECHA
-				if(A[pos_depX][pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+				if(A[pos_depX][pos_depY+1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
 					printf("\7");
 					continue;
 				}else{
-					//Si se puede mover hacia ARRIBA, regresar el sentido
+					//Si se puede mover hacia DERECHA, regresar el sentido
 					sentido = 'R';
 					return sentido;
 				}
@@ -67,8 +65,7 @@ char checarSentido(int pos_depX,int pos_depY){
 			if(pos_depX == 0){ //Ya no se puede ir a la IZQUIERDA, FIN DEL TABLERO
 					continue;
 				}else{
-					pos_depX = pos_depX - 1; //ir una casilla izquierda
-					if(A[pos_depX][pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+					if(A[pos_depX][pos_depY-1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
 						printf("\7");
 						continue;
 					}else{
@@ -82,8 +79,7 @@ char checarSentido(int pos_depX,int pos_depY){
 			if(pos_depX == 9){ //Ya no se puede ir hacia abajo, FIN DEL TABLERO
 				continue;
 			}else{
-				pos_depX = pos_depX +1; //ir una casilla ABAJO
-				if(A[pos_depX][pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+				if(A[pos_depX +1][pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
 					printf("\7");
 					continue;
 				}else{
@@ -111,6 +107,7 @@ int main(int argc, char const *argv[]){
 	A[9][9] = 2;
 	//Escribiendo los obstaculos
 	A[6][0] = 1;
+	A[6][1] = 1;
 
 	despliegaMAtriz();
 	int pos_depX = 0;
