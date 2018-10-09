@@ -128,7 +128,7 @@ int main(int argc, char const *argv[]){
 			if(sentido == 'U'){
 				pos_depY = pos_depY -1 ;
 				A[pos_depX][pos_depY] = 1;
-				A[pos_depX][pos_depY+1] = 0 //Esro borra tu rastro para que no te sigan los malditos
+				A[pos_depX][pos_depY+1] = 0;//Esro borra tu rastro para que no te sigan los malditos
 				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
 			}else if(sentido == 'R'){
 			//Mover hacia la derecha
