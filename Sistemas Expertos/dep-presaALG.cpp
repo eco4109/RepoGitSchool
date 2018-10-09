@@ -108,6 +108,7 @@ int main(int argc, char const *argv[]){
 	//Escribiendo los obstaculos
 	A[6][0] = 1;
 	A[6][1] = 1;
+	A[6][2] = 1;
 
 	despliegaMAtriz();
 	int pos_depX = 0;
@@ -127,21 +128,21 @@ int main(int argc, char const *argv[]){
 			
 			if(sentido == 'U'){
 				pos_depY = pos_depY -1 ;
-				A[pos_depX][pos_depY] = 1;
+				A[pos_depX][pos_depY] = 2;
 				A[pos_depX][pos_depY+1] = 0;//Esro borra tu rastro para que no te sigan los malditos
 				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
 			}else if(sentido == 'R'){
 			//Mover hacia la derecha
 				pos_depY = pos_depY + 1;
-				A[pos_depX][pos_depY] = 1;
+				A[pos_depX][pos_depY] = 2;
 				A[pos_depX][pos_depY-1] = 0;
 			}else if(sentido == 'L'){
 				pos_depX = pos_depX - 1 ;
-				A[pos_depX][pos_depY] = 1;
+				A[pos_depX][pos_depY] = 2;
 				A[pos_depX+1][pos_depY] = 0;
 			}else if(sentido == 'D'){
 				pos_depX = pos_depX + 1;
-				A[pos_depX][pos_depY] = 1;
+				A[pos_depX][pos_depY] = 2;
 				A[pos_depX-1][pos_depY] = 0;
 			}
 			printf("Quedaste en X: %d\n", pos_depX);
