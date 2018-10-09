@@ -37,7 +37,7 @@ char checarSentido(int pos_depX,int pos_depY, char movAnterior){
 	for (int i = 0; i <= 4; i++){
 		//printf("Intento hacia: %s\n",orden[i] );
 		if(orden[i] == "Arriba"){ //Checar si s puede mover hacia arriba
-			printf("Entro arriba\n");
+			//printf("Entro arriba\n");
 			if(pos_depX == 0){ //Ya no se puede subir, FIN DEL TABLERO
 				continue;
 			}else{
