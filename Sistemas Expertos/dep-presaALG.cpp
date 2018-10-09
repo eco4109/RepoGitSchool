@@ -130,10 +130,11 @@ int main(int argc, char const *argv[]){
 	A[0][0] = 2;
 	A[9][9] = 2;
 	//Escribiendo los obstaculos
+	//A[3][0] = 1;
+	//A[6][1] = 1;
+	//A[6][2] = 1;
 	A[6][0] = 1;
-	A[6][1] = 1;
-	A[6][2] = 1;
-	A[9][6] = 1;
+	A[5][1] = 1;
 
 	despliegaMAtriz();
 	int pos_depX = 0;
