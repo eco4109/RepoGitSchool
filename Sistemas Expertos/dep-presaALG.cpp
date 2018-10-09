@@ -104,6 +104,18 @@ int regresaMov(char sentido, int pos_depX,int pos_depY){
 	}
 }
 
+void imprimeVectoresMov(int VX[],int VY[], int i){
+	printf("Vector X: ");
+	for (int j = 0; j < i; j++){
+		printf("  %d  ", VX[j]);
+	}
+	printf("\n");
+	printf("Vector Y: ");
+	for (int j = 0; j < i; j++){
+		printf("  %d  ", VY[j]);
+	}
+}
+
 
 int main(int argc, char const *argv[]){
 	//Definir la matriz que será el tablero
@@ -121,7 +133,7 @@ int main(int argc, char const *argv[]){
 	A[6][0] = 1;
 	A[6][1] = 1;
 	A[6][2] = 1;
-	A[9][6] = 1;
+	//A[9][6] = 1;
 
 	despliegaMAtriz();
 	int pos_depX = 0;
@@ -129,12 +141,16 @@ int main(int argc, char const *argv[]){
 	int pos_preX = 9;
 	int pos_preY = 9;
 	float distancia2, distancia;
+	//Vectores que guardan los movimientos que se van haciendo
+	int VX[20];
+	int VY[20];
 	
 	distancia = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY); //Funcion para calcular la distancia ntre presa-depredado
 	printf("La distancia inicial entre el depredador y la presa es: %f\n", distancia);
 	if (distancia <=1){
 		printf("PRESA ALCANZADA CON EXITO\n");
 	}else{
+		int i = 0; //Variabler para TUS VECTORES XAVIIII
 		while(distancia>0){
 			getchar();
 			char sentido = checarSentido(pos_depX,pos_depY);
@@ -143,29 +159,40 @@ int main(int argc, char const *argv[]){
 			if(sentido == 'U'){
 				pos_depY = pos_depY -1 ;
 				A[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
 				A[pos_depX][pos_depY+1] = 0;//Esro borra tu rastro para que no te sigan los malditos
 				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
 			}else if(sentido == 'R'){
 			//Mover hacia la derecha
 				pos_depY = pos_depY + 1;
 				A[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
 				A[pos_depX][pos_depY-1] = 0;
 			}else if(sentido == 'L'){
 				pos_depY = pos_depY - 1 ;
 				A[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
 				A[pos_depX][pos_depY+1] = 0;
 			}else if(sentido == 'D'){
 				pos_depX = pos_depX + 1;
 				A[pos_depX][pos_depY] = 2;
+				VX[i] = pos_depX; //Lleno tu vector Xavi
+				VY[i] = pos_depY;
 				A[pos_depX-1][pos_depY] = 0;
 			}
+			i++;
 			printf("Quedaste en X: %d\n", pos_depX);
 			printf("Quedaste en Y: %d\n", pos_depY);
 			despliegaMAtriz();
-			distancia2 = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY);
-			printf("LA distancia es: %f\n",distancia2 );
+			distancia = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY);
+			printf("LA distancia es: %f\n",distancia );
 		}
 		printf("PRESA ALCANZADA CON EXITO\n");
+		printf("Vectores de movimiento XV y XY\n");
+		imprimeVectoresMov(VX,VY,i);
 	}
 	return 0;
 }
