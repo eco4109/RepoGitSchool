@@ -34,12 +34,17 @@ void creaObstaculos();
 void usarTexturaAlpha();
 void insertaObstaculos();
 void insertaMono(int posMonoX,int posMonoY);
+void hazMovimiento();
 //unsigned char * cargaObstaculo();
 
 
 
 int mObstaculos[10][10];
 int yaSeGenero = 0;
+int movX=0,movY=0;
+int coordenadasX[]= {1,8,5,3,4,7,8,9,2,4,4,6,3,4};
+int coordenadasY[] = {1,9,4,2,4,6,3,8,2,1,7,8,9,5};
+
 unsigned char * datos1[10];
 unsigned char * mono;
 const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -57,8 +62,6 @@ const GLfloat high_shininess[] = { 100.0f };
 
 */
 //char *str[5] = {"holi","perro","infeliz","comes","i,i"};
-
-
 
 unsigned char * leerImagen( const char * ruta,unsigned char * dato,int alto,int ancho){
     FILE *imagen;
@@ -103,8 +106,6 @@ void pegaImagen(char * ruta,unsigned char * dato,int alto,int ancho){
     //glPopMatrix();
 
 }
-
-
 void usarTexturaAlpha(unsigned char * dato,int alto,int ancho){
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -114,7 +115,6 @@ void usarTexturaAlpha(unsigned char * dato,int alto,int ancho){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ancho, alto, 0, GL_RGBA, GL_UNSIGNED_BYTE, dato);
 
 }
-
 unsigned char * cargaObstaculo(const char * ruta,unsigned char * dato,int alto,int ancho){
     FILE *imagen;
     imagen=fopen(ruta,"r");
@@ -162,7 +162,6 @@ void pegaImagenAlpha(char * ruta,unsigned char * dato,int alto,int ancho){
     glDisable(GL_ALPHA_TEST);
 
 }
-
 void pegaImagenAlphaMono(char * ruta,unsigned char * dato,int alto,int ancho){
     // glPushMatrix();
     usarTexturaAlpha(cargaMono(ruta,dato,alto,ancho),alto,ancho);
@@ -184,7 +183,6 @@ void pegaImagenAlphaMono(char * ruta,unsigned char * dato,int alto,int ancho){
     glDisable(GL_ALPHA_TEST);
 
 }
-
 void moveMouse(int x,int y){
     //printf("x:%d\ty:%d\n",x,y);
     estX = (10*x)/400;
@@ -201,7 +199,6 @@ void moveMouse(int x,int y){
     glutPostRedisplay();
 
 }
-
 void creaObstaculos(){
     int coordenadaX = 0;
     int coordenadaY = 0;
@@ -261,7 +258,6 @@ void mouse(int boton, int estado,int x,int y){
     }
     glutPostRedisplay();
     }
-
 void creaTablero(){
 
     for(int i=1; i<12;i++){
@@ -296,9 +292,7 @@ void creaTablero(){
 
 }
 /* GLUT callback Handlers */
-
-static void resize(int width, int height)
-{
+static void resize(int width, int height){
     const float ar = (float) width / (float) height;
 
     glViewport(0, 0, width, height);
@@ -308,8 +302,6 @@ static void resize(int width, int height)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity() ;
 }
-
-
 static void display(void){
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); esto es para 3D
 
@@ -321,10 +313,7 @@ static void display(void){
     //glutPostRedisplay();
     glFlush();
 }
-
-
-static void key(unsigned char key, int x, int y)
-{
+static void key(unsigned char key, int x, int y){
     switch (key)
     {
         case 27 :
@@ -333,14 +322,9 @@ static void key(unsigned char key, int x, int y)
 
     glutPostRedisplay();
 }
-
-static void idle(void)
-{
+static void idle(void){
     glutPostRedisplay();
 }
-
-
-
 /* Program entry point */
 void insertaObstaculos(){
     for(int i = 1; i<11;i++){
@@ -352,17 +336,15 @@ void insertaObstaculos(){
                     glTranslatef(j-.8 ,-i-.6,0);
                     glScalef(.45,1.7,0);
                     pegaImagenAlpha("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\obs.data",datos1[i],128,128);
-
                 //glPopMatrix();
                 glPopMatrix();
-
-
             }
         }
     }
     glPushMatrix();
         glScalef(2,1,0);
-        glTranslatef(.3,-1.5,0);
+        glTranslatef(movX+.3,-movY-1.4,0);/*el ajuste en x: es el -1 si es que la coordenada empieza en 0, pero si no, entonces empieza en 1 el ajuste es 0
+                                       el del y es el -.5 y ese es igual que en el X si empieza en 0 o 1*/
         glScalef(.45,1.7,0);
         pegaImagenAlphaMono("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\mon.data",mono,128,128);
     glPopMatrix();
@@ -372,6 +354,7 @@ void insertaObstaculos(){
         glScalef(.5,.5,0);
         pegaImagenAlphaMono("C:\\Users\\Xavier\\Desktop\\RepoGitSchool\\Sistemas Expertos\\SistemasExpertos\\ob.data",mono,128,128);
     glPopMatrix();
+    hazMovimiento();
 
 
 }
@@ -386,8 +369,13 @@ void insertaMono(int posMonoX,int posMonoY){
     glPopMatrix();
 
 }
-int main(int argc, char *argv[])
-{
+void hazMovimiento(){
+    int longitud = sizeof(coordenadasX)/4;
+    for(int o=0; 0<longitud;0++){
+
+    }
+}
+int main(int argc, char *argv[]){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB |GLUT_SINGLE);
     glutInitWindowSize(400,450);
