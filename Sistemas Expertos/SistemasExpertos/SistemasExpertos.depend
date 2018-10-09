@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1539036319 source:c:\users\xavier\desktop\repogitschool\sistemas expertos\sistemasexpertos\main.cpp
+	<windows.h>
+	<GLUT/glut.h>
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<time.h>
+
+976695772 c:\glut\include\gl\glut.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+893404800 c:\glut\include\gl\gl.h
+
+893404800 c:\glut\include\gl\glu.h
+	<GL/gl.h>
+
+1538681584 source:c:\users\xavier\desktop\repogitschool\sistemas expertos\sistemasexpertos\ejemplo.c
+	<stdio.h>
+
