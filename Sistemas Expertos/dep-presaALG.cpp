@@ -128,16 +128,21 @@ int main(int argc, char const *argv[]){
 			if(sentido == 'U'){
 				pos_depY = pos_depY -1 ;
 				A[pos_depX][pos_depY] = 1;
+				A[pos_depX][pos_depY+1] = 0 //Esro borra tu rastro para que no te sigan los malditos
+				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
 			}else if(sentido == 'R'){
 			//Mover hacia la derecha
 				pos_depY = pos_depY + 1;
 				A[pos_depX][pos_depY] = 1;
+				A[pos_depX][pos_depY-1] = 0;
 			}else if(sentido == 'L'){
 				pos_depX = pos_depX - 1 ;
 				A[pos_depX][pos_depY] = 1;
+				A[pos_depX+1][pos_depY] = 0;
 			}else if(sentido == 'D'){
 				pos_depX = pos_depX + 1;
 				A[pos_depX][pos_depY] = 1;
+				A[pos_depX-1][pos_depY] = 0;
 			}
 			printf("Quedaste en X: %d\n", pos_depX);
 			printf("Quedaste en Y: %d\n", pos_depY);
