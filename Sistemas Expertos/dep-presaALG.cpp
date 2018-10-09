@@ -133,7 +133,7 @@ int main(int argc, char const *argv[]){
 	A[6][0] = 1;
 	A[6][1] = 1;
 	A[6][2] = 1;
-	//A[9][6] = 1;
+	A[9][6] = 1;
 
 	despliegaMAtriz();
 	int pos_depX = 0;
@@ -144,6 +144,8 @@ int main(int argc, char const *argv[]){
 	//Vectores que guardan los movimientos que se van haciendo
 	int VX[20];
 	int VY[20];
+
+	int iteracion;
 	
 	distancia = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY); //Funcion para calcular la distancia ntre presa-depredado
 	printf("La distancia inicial entre el depredador y la presa es: %f\n", distancia);
@@ -157,11 +159,11 @@ int main(int argc, char const *argv[]){
 			printf("Muevete hacia: %c\n",sentido );
 			
 			if(sentido == 'U'){
-				pos_depY = pos_depY -1 ;
+				pos_depX = pos_depX -1 ;
 				A[pos_depX][pos_depY] = 2;
 				VX[i] = pos_depX; //Lleno tu vector Xavi
 				VY[i] = pos_depY;
-				A[pos_depX][pos_depY+1] = 0;//Esro borra tu rastro para que no te sigan los malditos
+				A[pos_depX+1][pos_depY] = 1;//Esro borra tu rastro para que no te sigan los malditos
 				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
 			}else if(sentido == 'R'){
 			//Mover hacia la derecha
@@ -169,19 +171,19 @@ int main(int argc, char const *argv[]){
 				A[pos_depX][pos_depY] = 2;
 				VX[i] = pos_depX; //Lleno tu vector Xavi
 				VY[i] = pos_depY;
-				A[pos_depX][pos_depY-1] = 0;
+				A[pos_depX][pos_depY-1] = 1;
 			}else if(sentido == 'L'){
 				pos_depY = pos_depY - 1 ;
 				A[pos_depX][pos_depY] = 2;
 				VX[i] = pos_depX; //Lleno tu vector Xavi
 				VY[i] = pos_depY;
-				A[pos_depX][pos_depY+1] = 0;
+				A[pos_depX][pos_depY+1] = 1;
 			}else if(sentido == 'D'){
 				pos_depX = pos_depX + 1;
 				A[pos_depX][pos_depY] = 2;
 				VX[i] = pos_depX; //Lleno tu vector Xavi
 				VY[i] = pos_depY;
-				A[pos_depX-1][pos_depY] = 0;
+				A[pos_depX-1][pos_depY] = 1;
 			}
 			i++;
 			printf("Quedaste en X: %d\n", pos_depX);
@@ -191,8 +193,8 @@ int main(int argc, char const *argv[]){
 			printf("LA distancia es: %f\n",distancia );
 		}
 		printf("PRESA ALCANZADA CON EXITO\n");
-		printf("Vectores de movimiento XV y XY\n");
-		imprimeVectoresMov(VX,VY,i);
+		//printf("Vectores de movimiento XV y XY\n");
+		//imprimeVectoresMov(VX,VY,i);
 	}
 	return 0;
 }
