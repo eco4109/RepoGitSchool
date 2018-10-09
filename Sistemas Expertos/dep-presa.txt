@@ -1,4 +1,5 @@
 
+
 //Agoritmo presa-depredador.
 
 def menuPrincipal(){
@@ -120,7 +121,127 @@ def checarSentido(A, pos_depX,pos_depY){
 	
 	
 
+
+
+//Agoritmo presa-depredador.
+
+def menuPrincipal(){
+	A //Matriz de movimientos
+	pos_depX //Posicion inicial dl depredador en X
+	pos_depY //Posicion inicial dl depredador en Y
+	pos_preX //Posicion inicial de la presa
+	pos_preY //Posicion inicial de la presa
+	
+	distancia = calculaDistancia(A, pos_depX,pos_depY, pos_preX, pos_depY) //Funcion para calcular la distancia ntre presa-depredado
+	
+	si (distancia == 0){
+		se alcanzo la presa
+	}sino{
+		mientras(distancia > 0){
+		sentido = checarSentido(A, pos_depX,pos_depY) //Fucnion para chcar el sentido hacia donde moverse
+
+		//Moverce hacia el lado que esta en sentido
+		if(sentido == "ARRIBA"){
+			pos_depY = pos_depY + 1
+		}sino(sentido == "DERECHA"){
+			//Mover hacia la derecha
+			pos_depX = pos_depX + 1
+		}sino(sentido == "IZQUIERDA"){
+			pos_depX = pos_depX - 1 
+		}sino(sentido == "ABAJO"){
+			pos_depY = pos_depY - 1
+		}
+
+		//Volver a checar la distancia para saber si nos acercamos o alejamos al movernos
+		distancia2 = calculaDistancia(A, pos_depX,pos_depY, pos_preX, pos_depY)
+
+		if(distancia2<distancia){ //Nos acercamos, vamos bien.
+			imprimir("Mover hacia: ", sentido)
+			imprmir("Quedamos en:", pos_depX, pos_depY)
+		}sino{ //Nos alejamos, REGRESAR
+			regresaMov(sentido, pos_depX,pos_depY) //Le enra el sentido para saber hacia donde 
+			//Una vez que regresamos YA NO NOS VAMOS A MOVER HACIA ALLÁ
+		}
+		}
+	}
+}
+	
+def regresaMov(sentido, pos_depX,pos_depY){
+	if(sentido == "ARRIBA"){ //Rgrsar hacia abajo
+		pos_depY = pos_depY - 1
+	}sino(sentido == "DERECHA"){ //Regresar a a izquerda
+		pos_depX = pos_depX - 1
+	}sino(sentido == "IZQUIERDA"){ //Regresar a la derecha
+		pos_depX = pos_depX + 1
+	}sino(sentido == "ABAJO"){ //Regresar hacia arriba
+		pos_depY = pos_depY +1
+	}
+}
+	
+def calculaDistancia(A, pos_depX,pos_depY, pos_preX, pos_depY){
+	distancia = raiz2((pos_preX-pos_depX)**2+(pos_depY-pos_preY)**2) //Formula para calcular la distancia
+	regresa distancia
+}
+
+def checarSentido(A, pos_depX,pos_depY){
+	//Se checara el sentido en el que se puede mover el depredador, en este orden especifico:
+	orden = ["Arriba", "Derecha", "Izquierda", "Abajo"]
+	para i = 0 hasta i<=3 con i++
+		si(orden[i] == "Arriba"){ //Checar si s puede mover hacia arriba
+			si(pos_depY == 10){ /7Ya no se puede subir, FIN DEL TABLERO
+				pass
+			}sino{
+				pos_depY = pos_depY + 1 //Subir una casilla arriba
+				si(A[pos_depX, pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+					passs
+				}sino{
+					//Si se puede mover hacia ARRIBA, regresar el sentido
+					sentido = "ARRIBA"
+					regresa sentido
+				}
+			}			
+		}sino(orden[i] == "Derecha"){
+			si(pos_depX == 10){ //Ya no se puede ir a la DERECHA, FIN DEL TABLERO
+					pass
+				}sino{
+					pos_depX = pos_depX + 1 //ir una casilla DERECHA
+					si(A[pos_depX, pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+						passs
+					}sino{
+						//Si se puede mover hacia ARRIBA, regresar el sentido
+						sentido = "DERECHA"
+						regresa sentido
+					}
+				}
+		}sino(orden[i] == "Izquierda"){
+			si(pos_depX == 1){ /7Ya no se puede ir a la IZQUIERDA, FIN DEL TABLERO
+					pass
+				}sino{
+					pos_depX = pos_depX - 1 //ir una casilla izquierda
+					si(A[pos_depX, pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+						passs
+					}sino{
+						//Si se puede mover hacia ARRIBA, regresar el sentido
+						sentido = "IZQUIERDA"
+						regresa sentido
+					}
+				}
+		}sino(orden[i] == "Abajo"){
+			si(pos_depX == 1){ /7Ya no se puede ir a la DERECHA, FIN DEL TABLERO
+					pass
+				}sino{
+					pos_depX = pos_depX -1 1 //ir una casilla ABAJO
+					si(A[pos_depX, pos_depY] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+						passs
+					}sino{
+						//Si se puede mover hacia ABAJO, regresar el sentido
+						sentido = "ABAJO"
+						regresa sentido
+					}
+				}
+		}
+}
+	
 	
 
 
-	
