@@ -24,13 +24,14 @@ void despliegaMAtriz(){
 	printf("\n");
 }
 
-char checarSentido(int pos_depX,int pos_depY){
+char checarSentido(int pos_depX,int pos_depY, char movAnterior){
 	printf("Vienes de X: %d\n",pos_depX );
 	printf("Vienes de Y: %d\n",pos_depY );
 	//Se checara el sentido en el que se puede mover el depredador, en este orden especifico:
-	const char *orden[4] = {"Abajo", "Derecha", "Arriba", "Izquierda"};
+	const char *orden[5] = {"Abajo", "Derecha", "Arriba", "Izquierda", "Encerrado"};
 	char sentido;
-	for (int i = 0; i < 3; i++){
+	for (int i = 0; i <= 4; i++){
+		printf("IIIIIIIIIIIIIIIIIII: %d \n", i);
 		printf("Intento hacia: %s\n",orden[i] );
 		if(orden[i] == "Arriba"){ //Checar si s puede mover hacia arriba
 			printf("Entro arriba\n");
@@ -63,17 +64,17 @@ char checarSentido(int pos_depX,int pos_depY){
 		}else if(orden[i] == "Izquierda"){
 			printf("Entro a la izquierda\n");
 			if(pos_depY == 0){ //Ya no se puede ir a la IZQUIERDA, FIN DEL TABLERO
+				continue;
+			}else{
+				if(A[pos_depX][pos_depY-1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
+					printf("\7");
 					continue;
 				}else{
-					if(A[pos_depX][pos_depY-1] == 1){ //Se lee la nueva casilla para saber si hay obstaculo
-						printf("\7");
-						continue;
-					}else{
-						//Si se puede mover hacia ARRIBA, regresar el sentido
-						sentido = 'L';
-						return sentido;
-					}
+					//Si se puede mover hacia ARRIBA, regresar el sentido
+					sentido = 'L';
+					return sentido;
 				}
+			}
 		}else if(orden[i] == "Abajo"){
 			printf("Entro a  Abajo\n");
 			if(pos_depX == 9){ //Ya no se puede ir hacia abajo, FIN DEL TABLERO
@@ -87,6 +88,18 @@ char checarSentido(int pos_depX,int pos_depY){
 					sentido = 'D';
 					return sentido;
 				}
+			}
+		}else if(orden[i] == "Encerrado"){
+			printf("Entro a Encerrado\n");
+			//Cuando estoy totalomente encerrado, YO ME ENCERRÉ JAJAJA regresarme xD
+			switch(movAnterior){
+				case 'D':
+					sentido = 'U';
+					return sentido;
+					break;
+				case 'R':
+					sentido = 'L';
+					break;
 			}
 		}
 	}		
@@ -146,7 +159,7 @@ int main(int argc, char const *argv[]){
 	int VX[20];
 	int VY[20];
 
-	int iteracion;
+	char movAnterior = 'N';
 	
 	distancia = calculaDistancia(pos_depX,pos_depY, pos_preX, pos_preY); //Funcion para calcular la distancia ntre presa-depredado
 	printf("La distancia inicial entre el depredador y la presa es: %f\n", distancia);
@@ -156,7 +169,8 @@ int main(int argc, char const *argv[]){
 		int i = 0; //Variabler para TUS VECTORES XAVIIII
 		while(distancia>0){
 			getchar();
-			char sentido = checarSentido(pos_depX,pos_depY);
+			char sentido = checarSentido(pos_depX,pos_depY, movAnterior);
+			movAnterior = sentido;
 			printf("Muevete hacia: %c\n",sentido );
 			
 			if(sentido == 'U'){
@@ -165,6 +179,7 @@ int main(int argc, char const *argv[]){
 				VX[i] = pos_depX; //Lleno tu vector Xavi
 				VY[i] = pos_depY;
 				A[pos_depX+1][pos_depY] = 1;//Esro borra tu rastro para que no te sigan los malditos
+
 				//Osea para no ir dejando un camino de 1´s y simular más movimiento JIJIJI aplica en todos
 			}else if(sentido == 'R'){
 			//Mover hacia la derecha
