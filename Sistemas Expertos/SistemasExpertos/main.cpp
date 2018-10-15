@@ -235,6 +235,7 @@ void creaObstaculos(){
     int coordenadaY = 0;
     if (yaSeGenero==0){
     srand(time(NULL));
+    /*Esto es para los obstaculos*/
     for(int i=0; i<10;i++){
 
         coordenadaX = rand() % 11;
@@ -435,8 +436,8 @@ static void idle(void){
 }
 /* Program entry point */
 void insertaObstaculos(){
-    for(int i = 1; i<10;i++){
-        for(int j = 1; j<10; j++){
+    for(int i = 1; i<11;i++){
+        for(int j = 1; j<11; j++){
             if (mObstaculos[i-1][j-1] == 1){
                 //printf("Las coordenadas son: %d,%d\n", i,j);
                 glPushMatrix();
