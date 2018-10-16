@@ -1,0 +1,76 @@
+globals [ speed ]
+
+to setup
+  clear-all
+  
+  create-turtles 1 [
+    setxy -5 4
+    set color red
+    set shape "airplane"
+    set heading 180
+  ]
+  
+  create-turtles 1 [
+    setxy -5 -34
+    set color blue
+    set shape "airplane"
+    set heading 0
+  ]
+  
+  set speed .1
+  ask patches with [ pzcor = -8 ] [ set pcolor green + (random-float 2) - 1 ]
+  ask patches with [ pzcor = -8 and pxcor > -12 and pxcor < 2 ]
+    [ set pcolor gray ]
+  ask patches with [ pxcor = 5 and pycor = -7 and pzcor > -8 and pzcor < -1 ]
+    [ set pcolor gray - 3 ]
+  ask patches with [ pxcor > 3 and pxcor < 11 and pycor > -3 and pycor < 10 and pzcor = -7 ]
+    [ set pcolor gray + 3 ]
+  reset-ticks
+end
+
+to go
+  if speed = 0 [ stop ]
+  ask turtle 0 [
+    ;if ( heading != 180 )
+    ;[ set heading heading - 1 ]
+    if ( pitch != 345 and heading <= 180.1 and zcor > -6 )
+    [ set pitch precision (pitch - .1) 3 ]
+    if ( roll != 0 and heading < 226 )
+    [ set roll precision (roll + 1) 3 ]
+    if ( roll = 0 and pitch = -15 )
+    [ set zcor zcor - .00 ]
+    if ( zcor < -6.2 and pitch != 0 )
+    [ set pitch precision (pitch + .2) 3 ]
+    if ( zcor < -6.2 and pitch = 0 and speed > 0 )
+    [ set speed speed - .001 ]
+    fd speed
+  ]
+  
+  
+  ask turtle 1 [
+    ask other turtles in-radius (size * 5) [
+      set heading -95
+    ]
+    ask other turtles in-radius ( size / 2) [die]
+    ;if ( heading != 180 )
+    ;[ set heading heading - 1 ]
+    if ( pitch != 345 and heading <= 180.1 and zcor > -6 )
+    [ set pitch precision (pitch - .1) 3 ]
+    if ( roll != 0 and heading < 226 )
+    [ set roll precision (roll + 1) 3 ]
+    if ( roll = 0 and pitch = -15 )
+    [ set zcor zcor - .00 ]
+    if ( zcor < -6.2 and pitch != 0 )
+    [ set pitch precision (pitch + .2) 3 ]
+    if ( zcor < -6.2 and pitch = 0 and speed > 0 )
+    [ set speed speed - .001 ]
+    fd speed
+  ]
+  
+  tick
+end
+
+
+; Public Domain:
+; To the extent possible under law, Uri Wilensky has waived all
+; copyright and related or neighboring rights to this model.
