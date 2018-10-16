@@ -6,6 +6,7 @@
 */
 import java.io.*;
 import java.nio.*;
+import java.util.*;
 
 
 public class pc{
@@ -56,6 +57,9 @@ public class pc{
     static final int MEM_LECT_DP=74;
 	static final int BANDON=192;
 	static final int BANDOFF=193;
+
+
+	public static boolean CPUInt = false;
 
 
 	//Dispositivos y arranque del BIOS
@@ -493,6 +497,7 @@ public class pc{
 	}
 // dump instrution, instruction in user mode 
 	public static void main(String[] argumento) {
+		
 
 		if(argumento.length!=0){
 			if(argumento[0].equals("BIOS"))
@@ -510,6 +515,8 @@ public class pc{
 			}
 			System.exit(0);
 		}
+		Computadora COMPAQ = new Computadora();
+		Interrupcion interrumpe = new Interrupcion();
 		
 		
 		
@@ -522,7 +529,10 @@ public class pc{
 		for (int i = 0; i<=13 ; i++) {
 		 	R[i] = 0;
 		 } 
-		 while(!PSW[14]){
+		 
+		 COMPAQ.start();
+		 interrumpe.start();
+		/* while(!PSW[14]){
 		 	//dump(0);
 		 	capta();
 		 	traduce();
@@ -530,51 +540,89 @@ public class pc{
 		 	//pausa();
 		 	//dump(0);
 		 }
-		 System.out.println("Termino la computadora virtual.");
+		 System.out.println("Termino la computadora virtual.");*/
 
 	}
 
 	public static void escribeDisco(){
-		RAM[0]=(byte)0x60;
-		RAM[1]=(byte)0x06;
-		RAM[2]=(byte)0xFE;
-		RAM[3]=(byte)0xAD;
-		RAM[4]=(byte)0xB1;
-		RAM[5]=(byte)0xC7;
-		RAM[6]=(byte)0x60;
-		RAM[7]=(byte)0x04;
-		RAM[8]=(byte)0x49;
-		RAM[9]=(byte)0x55;
-		RAM[10]=(byte)0xC2;
-		RAM[11]=(byte)0x40;
-		RAM[12]=(byte)0x47;
-		RAM[13]=(byte)0x00;
-		RAM[14]=(byte)0x0;
-		RAM[15]=(byte)0x00;
-		RAM[16]=(byte)0x21;
-		RAM[17]=(byte)0x00;
-		RAM[18]=(byte)0x49;
-		RAM[19]=(byte)0x55;
-		RAM[20]=(byte)0xC1;
-		RAM[21]=(byte)0xE0;
+		RAM[0]=(byte)0x00;
+		RAM[1]=(byte)0x01;
+		RAM[2]=(byte)0x00;
+		RAM[3]=(byte)0x01;
+		RAM[4]=(byte)0x00;
+		RAM[5]=(byte)0x01;
+		RAM[6]=(byte)0x00;
+		RAM[7]=(byte)0x01;
+		RAM[8]=(byte)0x00;
+		RAM[9]=(byte)0x01;
+		RAM[10]=(byte)0x00;
+		RAM[11]=(byte)0x01;
+		RAM[12]=(byte)0x00;
+		RAM[13]=(byte)0x01;
+		RAM[14]=(byte)0x00;
+		RAM[15]=(byte)0x01;
+		RAM[16]=(byte)0x00;
+		RAM[17]=(byte)0x01;
+		RAM[18]=(byte)0x00;
+		RAM[19]=(byte)0x01;
+		RAM[20]=(byte)0x00;
+		RAM[21]=(byte)0x01;
 		RAM[22]=(byte)0x00;
-		RAM[23]=(byte)0x00;
+		RAM[23]=(byte)0x01;
 		RAM[24]=(byte)0x00;
-		RAM[25]=(byte)0x00;
+		RAM[25]=(byte)0x01;
 		RAM[26]=(byte)0x00;
-		RAM[27]=(byte)0x00;
+		RAM[27]=(byte)0x01;
 		RAM[28]=(byte)0x00;
-		RAM[29]=(byte)0x00;
+		RAM[29]=(byte)0x01;
 		RAM[30]=(byte)0x00;
-		RAM[31]=(byte)0x00;
+		RAM[31]=(byte)0x01;
 		RAM[32]=(byte)0x00;
-		RAM[33]=(byte)0x00;
+		RAM[33]=(byte)0x01;
 		RAM[34]=(byte)0x00;
-		RAM[35]=(byte)0x00;
+		RAM[35]=(byte)0x01;
 		RAM[36]=(byte)0x00;
-		RAM[37]=(byte)0x00;
+		RAM[37]=(byte)0x01;
 		RAM[38]=(byte)0x00;
-		RAM[39]=(byte)0x00;
+		RAM[39]=(byte)0x01;
+		RAM[40]=(byte)0x00;
+		RAM[41]=(byte)0x01;
+		RAM[42]=(byte)0x00;
+		RAM[43]=(byte)0x01;
+		RAM[44]=(byte)0x00;
+		RAM[45]=(byte)0x01;
+		RAM[46]=(byte)0x00;
+		RAM[47]=(byte)0x01;
+		RAM[48]=(byte)0x00;
+		RAM[49]=(byte)0x01;
+		RAM[50]=(byte)0x00;
+		RAM[51]=(byte)0x01;
+		RAM[52]=(byte)0x00;
+		RAM[53]=(byte)0x01;
+		RAM[54]=(byte)0x00;
+		RAM[55]=(byte)0x01;
+		RAM[56]=(byte)0x00;
+		RAM[57]=(byte)0x01;
+		RAM[58]=(byte)0x00;
+		RAM[59]=(byte)0x01;
+		RAM[60]=(byte)0x00;
+		RAM[61]=(byte)0x01;
+		RAM[62]=(byte)0x00;
+		RAM[63]=(byte)0x01;
+		RAM[64]=(byte)0x00;
+		RAM[65]=(byte)0x01;
+		RAM[66]=(byte)0x00;
+		RAM[67]=(byte)0x01;
+		RAM[68]=(byte)0x00;
+		RAM[69]=(byte)0x01;
+		RAM[70]=(byte)0x20;
+		RAM[71]=(byte)0x03;
+		RAM[72]=(byte)0x00;
+		RAM[73]=(byte)0x00;
+		RAM[74]=(byte)0x00;
+		RAM[75]=(byte)0x00;
+
+
 		escribe("DSK1.dsk",13);
 	}
 	public static void lee(String archivo, int pos){
@@ -601,4 +649,33 @@ public class pc{
 			System.exit(0);
 			}
 		}
+}
+
+class Computadora extends Thread{
+	public void run(){
+		while(!pc.PSW[14]){
+			pc.capta();
+		 	pc.traduce();
+		 	pc.ejecuta();
+		 	if(pc.CPUInt)
+		 		pc.dump(0);
+			pc.CPUInt = false;
+		 	
+		}
+	}
+
+}
+
+class Interrupcion extends Thread{
+	public void run(){
+		 Random generadorAleatorios = new Random();
+		while(true){
+			//System.out.println(generadorAleatorios.nextInt(100));
+			if (generadorAleatorios.nextInt(10000000)==5469){
+				pc.CPUInt = true;
+			}
+
+		}
+	}
+
 }
