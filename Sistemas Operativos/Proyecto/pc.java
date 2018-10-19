@@ -5,6 +5,8 @@
 	Programa para simular el cpu de una computadora virtual
 */
 import java.io.*;
+import java.nio.*;
+import java.util.*;
 
 
 public class pc{
@@ -31,6 +33,7 @@ public class pc{
 	static final int ALU_B1 = 0;
 	static final int ALU_B2 = 1;
 	static final int ALU_B3 = 2;
+
 	static final int MMU_B1 = 3;
 	static final int MMU_B2 = 4;
 	static final int MMU_B3 = 5;
@@ -43,6 +46,20 @@ public class pc{
 	static final int MUE_DATO_REG = 32;
 	static final int MUE_DATO_BUS = 96;
 	static final int SBAND = 49;
+	static final int DUMP=33;
+	static final int MMU_OPER=70;
+    static final int MMU_BY_PASS=71;
+    static final int MEM_ESC_B=2;
+    static final int MEM_ESC_P=3;
+    static final int MEM_ESC_DP=4;
+    static final int MEM_LECT_B=72;
+    static final int MEM_LECT_P=73;
+    static final int MEM_LECT_DP=74;
+	static final int BANDON=192;
+	static final int BANDOFF=193;
+
+
+	public static boolean CPUInt = false;
 
 
 	//Dispositivos y arranque del BIOS
@@ -80,7 +97,8 @@ public class pc{
 	//Buffer Arrays, contains bits in each position
 	public static String[] r2binary = new String[2];
 	public static String[] r4binary = new String[4];
-	
+	static byte buff_trad[]= new byte[2];
+	static byte buff_dato[]= new byte[4];
 
 	public static int[] data = new int[4];
 	static int dato;
@@ -104,6 +122,40 @@ public class pc{
 		}
 		return nada;
 	}
+	public static int verificaValor(int valor, int num){
+		int masc1=128;
+		int masc2=64;
+		int masc3=32;
+		int R;
+		
+		if(num==1){
+			R = valor & masc1;
+			
+			if(R==128){
+				return 1;
+			}else{
+				return 0;
+			}
+		}else if(num==2){
+			R = valor & masc2;
+			if(R==64){
+				return 1;
+			}else{
+				return 0;
+			}
+		}else if(num==3){
+			R = valor & masc3;
+			if(R==32){
+				return 1;
+			}else{
+				return 0;
+			}
+		}else{
+			return 0;
+		}
+		
+	}
+	
 
 	public static void printArrayinDec(byte[] array){ //Function for print an Array in decimal, a BYTE comes in
 		for (int i=0;i<array.length;i++) {
@@ -305,26 +357,64 @@ public class pc{
 						PSW[5]=true;
 				}
 				break;         
-                        case SBAND:
-                            if(PSW[orig]){
-                                R[dest]=dato;
-                            }
-                        case MMU_OPER:
-                            res_alu=IEEE_a_flotante(B[MMU_B1])+IEEE_a_flotante(B[MMU_B2]);
-                            if(forceint(res_alu)<=999&&!PSW[15]){
-                                System.out.println("\7Violacion de memoria");
-                                System.exit(4);
-                            }else
-                                B[MMU_B3]=flotante_a_IEEE(res_alu);
-                            break;
-                        case MMU_BY_PASS:
-                            temp1=forceint(IEEE_a_flotante(B[MMU_B2]));
-                            if(temp1<=999&&!PSW[15]){
-                                System.out.println("\7Violacion de memoria");
-                                System.exit(4);
-                            }else
-                                B[MMU_B3]=B[MMU_B2];
-                            break;
+            case SBAND:
+                   if(PSW[orig]){
+                       R[dest]=dato;
+                   }
+            case MMU_OPER:
+                   res_alu=IEEE_a_flotante(B[MMU_B1])+IEEE_a_flotante(B[MMU_B2]);
+                   if(forceint(res_alu)<=999&&!PSW[15]){
+                       System.out.println("\7Violacion de memoria");
+                       System.exit(4);
+                   }else
+                       B[MMU_B3]=flotante_a_IEEE(res_alu);
+                   break;
+            case MMU_BY_PASS:
+                   temp1=forceint(IEEE_a_flotante(B[MMU_B2]));
+                   if(temp1<=999&&!PSW[15]){
+                       System.out.println("\7Violacion de memoria");
+                       System.exit(4);
+                   }else
+                       B[MMU_B3]=B[MMU_B2];
+                   break;
+            case MEM_LECT_B:
+            	B[MEM_B2] = RAM[forceint(IEEE_a_flotante(MMU_B3))] & 0xFF;
+            	break;
+            case MEM_LECT_P:
+            	temp1 = forceint(IEEE_a_flotante(B[MMU_B3]));
+            	buff_dato[0] = (byte)0x00;
+            	buff_dato[1] = (byte)0x00;
+            	buff_dato[2] = RAM[temp1++];
+            	buff_dato[3] = RAM[temp1];
+            	B[MEM_B2] = ByteBuffer.wrap(buff_dato).getInt();
+            	break;
+            case MEM_LECT_DP:
+            	temp1 = forceint(IEEE_a_flotante(B[MMU_B3]));
+            	buff_dato[0] = RAM[temp1++];
+            	buff_dato[1] = RAM[temp1++];
+            	buff_dato[2] = RAM[temp1++];
+            	buff_dato[3] = RAM[temp1];
+            	break;
+            case MEM_ESC_B:
+            	RAM[forceint(IEEE_a_flotante(B[MMU_B3]))] = (byte)(B[MEM_B1]>>>0);
+            	break;
+            case MEM_ESC_P:
+		        temp2 = forceint(IEEE_a_flotante(B[MMU_B3]));
+		        RAM[temp2++]= (byte)(B[MEM_B1]>>>0);
+            	break;
+            case MEM_ESC_DP:
+            	temp2 = forceint(IEEE_a_flotante(B[MMU_B3]));
+            	RAM[temp2++] = (byte)(B[MEM_B1]>>>24);
+            	RAM[temp2++] = (byte)(B[MEM_B1]>>>16);
+            	RAM[temp2++] = (byte)(B[MEM_B1]>>>8);
+            	RAM[temp2] = (byte)(B[MEM_B1]>>>0);
+            	break;
+			case BANDON:
+				PSW[orig] = true;
+				break;
+			case BANDOFF:
+				PSW[orig] = false;
+				break;
 			default:
 				break;
 		}
@@ -407,6 +497,7 @@ public class pc{
 	}
 // dump instrution, instruction in user mode 
 	public static void main(String[] argumento) {
+		
 
 		if(argumento.length!=0){
 			if(argumento[0].equals("BIOS"))
@@ -417,57 +508,121 @@ public class pc{
 			if(argumento.length==3 && argumento[0].equals("CreaUSB")){
 				CrearUSB.creaUSB(argumento[1],argumento[2]);
 			}
+			if(argumento[0].equals("escribe")){
+				escribeDisco();
+				System.out.println("Escritura correctaa");
+				pausa();
+			}
 			System.exit(0);
-
 		}
+		Computadora COMPAQ = new Computadora();
+		Interrupcion interrumpe = new Interrupcion();
 		
-		//escribeDisco();
-		//pausa();
+		
+		
 		BIOS.VerifDispo();
 		BIOS.StartUP();
 		for (int i=0; i<=45 ; i++) {
 			 System.out.printf("RAM[%d] = %02X\t",i,RAM[i]);
 		}
-
 		PSW[15] = true;
 		for (int i = 0; i<=13 ; i++) {
 		 	R[i] = 0;
 		 } 
-		 while(true){
-		 	dump(0);
+		 
+		 COMPAQ.start();
+		 interrumpe.start();
+		/* while(!PSW[14]){
+		 	//dump(0);
 		 	capta();
 		 	traduce();
 		 	ejecuta();
-		 	pausa();
-		 	dump(0);
-		 	
+		 	//pausa();
+		 	//dump(0);
 		 }
+		 System.out.println("Termino la computadora virtual.");*/
 
 	}
 
 	public static void escribeDisco(){
-		buffer[0]=(byte)0x20;
-		buffer[1]=(byte)0x05;
-		buffer[2]=(byte)0x41;
-		buffer[3]=(byte)0xC4;
-		buffer[4]=(byte)0x00;
-		buffer[5]=(byte)0x00;
-		buffer[6]=(byte)0x20;
-		buffer[7]=(byte)0x07;
-		buffer[8]=(byte)0x41;
-		buffer[9]=(byte)0xB9;
-		buffer[10]=(byte)0x0A;
-		buffer[11]=(byte)0x3D;
-		buffer[12]=(byte)0x06;
-		buffer[13]=(byte)0x75;
-		buffer[14]=(byte)0x21;
-		buffer[15]=(byte)0x00;
-		buffer[16]=(byte)0x00;
-		buffer[17]=(byte)0x00;
-		buffer[18]=(byte)0x00;
-		buffer[19]=(byte)0x00;
-		buffer[20]=(byte)0x00;
-		buffer[21]=(byte)0x00;
+		RAM[0]=(byte)0x00;
+		RAM[1]=(byte)0x01;
+		RAM[2]=(byte)0x00;
+		RAM[3]=(byte)0x01;
+		RAM[4]=(byte)0x00;
+		RAM[5]=(byte)0x01;
+		RAM[6]=(byte)0x00;
+		RAM[7]=(byte)0x01;
+		RAM[8]=(byte)0x00;
+		RAM[9]=(byte)0x01;
+		RAM[10]=(byte)0x00;
+		RAM[11]=(byte)0x01;
+		RAM[12]=(byte)0x00;
+		RAM[13]=(byte)0x01;
+		RAM[14]=(byte)0x00;
+		RAM[15]=(byte)0x01;
+		RAM[16]=(byte)0x00;
+		RAM[17]=(byte)0x01;
+		RAM[18]=(byte)0x00;
+		RAM[19]=(byte)0x01;
+		RAM[20]=(byte)0x00;
+		RAM[21]=(byte)0x01;
+		RAM[22]=(byte)0x00;
+		RAM[23]=(byte)0x01;
+		RAM[24]=(byte)0x00;
+		RAM[25]=(byte)0x01;
+		RAM[26]=(byte)0x00;
+		RAM[27]=(byte)0x01;
+		RAM[28]=(byte)0x00;
+		RAM[29]=(byte)0x01;
+		RAM[30]=(byte)0x00;
+		RAM[31]=(byte)0x01;
+		RAM[32]=(byte)0x00;
+		RAM[33]=(byte)0x01;
+		RAM[34]=(byte)0x00;
+		RAM[35]=(byte)0x01;
+		RAM[36]=(byte)0x00;
+		RAM[37]=(byte)0x01;
+		RAM[38]=(byte)0x00;
+		RAM[39]=(byte)0x01;
+		RAM[40]=(byte)0x00;
+		RAM[41]=(byte)0x01;
+		RAM[42]=(byte)0x00;
+		RAM[43]=(byte)0x01;
+		RAM[44]=(byte)0x00;
+		RAM[45]=(byte)0x01;
+		RAM[46]=(byte)0x00;
+		RAM[47]=(byte)0x01;
+		RAM[48]=(byte)0x00;
+		RAM[49]=(byte)0x01;
+		RAM[50]=(byte)0x00;
+		RAM[51]=(byte)0x01;
+		RAM[52]=(byte)0x00;
+		RAM[53]=(byte)0x01;
+		RAM[54]=(byte)0x00;
+		RAM[55]=(byte)0x01;
+		RAM[56]=(byte)0x00;
+		RAM[57]=(byte)0x01;
+		RAM[58]=(byte)0x00;
+		RAM[59]=(byte)0x01;
+		RAM[60]=(byte)0x00;
+		RAM[61]=(byte)0x01;
+		RAM[62]=(byte)0x00;
+		RAM[63]=(byte)0x01;
+		RAM[64]=(byte)0x00;
+		RAM[65]=(byte)0x01;
+		RAM[66]=(byte)0x00;
+		RAM[67]=(byte)0x01;
+		RAM[68]=(byte)0x00;
+		RAM[69]=(byte)0x01;
+		RAM[70]=(byte)0x20;
+		RAM[71]=(byte)0x03;
+		RAM[72]=(byte)0x00;
+		RAM[73]=(byte)0x00;
+		RAM[74]=(byte)0x00;
+		RAM[75]=(byte)0x00;
+
+
 		escribe("DSK1.dsk",13);
 	}
 	public static void lee(String archivo, int pos){
@@ -485,7 +640,7 @@ public class pc{
 		try{
 			RandomAccessFile binfile = new RandomAccessFile(Archivo, "rw");
 			binfile.seek(pos);
-			binfile.write(buffer);
+			binfile.write(RAM);
 			binfile.close();
 
 		} catch(IOException ex){
@@ -494,6 +649,33 @@ public class pc{
 			System.exit(0);
 			}
 		}
+}
+
+class Computadora extends Thread{
+	public void run(){
+		while(!pc.PSW[14]){
+			pc.capta();
+		 	pc.traduce();
+		 	pc.ejecuta();
+		 	if(pc.CPUInt)
+		 		pc.dump(0);
+			pc.CPUInt = false;
+		 	
+		}
 	}
 
+}
 
+class Interrupcion extends Thread{
+	public void run(){
+		 Random generadorAleatorios = new Random();
+		while(true){
+			//System.out.println(generadorAleatorios.nextInt(100));
+			if (generadorAleatorios.nextInt(10000000)==5469){
+				pc.CPUInt = true;
+			}
+
+		}
+	}
+
+}
