@@ -81,3 +81,31 @@ K). Tomar el byte que corresponde a origen y destino (el segundo byte del arregl
 Esto es todo lo que hace el traductor de la canalización de 3 etapas. 
 
 ========================================================================
+
+
+
+
+Tarea 17/10/18
+
+-Programar un quantum para que determine el tiempo en que se generen las interrupciones.
+-Un algoritmo para colas circular que desperdicie una casilla y otro que no desperdicie ninguna (Meter algo en la cola y sacar algo de la cola).
+-Generar un subproceso que alimente la cola, y la computadora virtual tiene que checar la cola o generar un toque a la computadora cuando esta tenga un elemento
+*Investigar el sinchronize de java
+
+
+
+
+
+
+
+
+=====================================================================================
+Formulas para el tema de maquina virtual
+
+dirVirt/tamBloque = bloque 
+
+bloq * tamañoBloq = inicioBloque
+
+desplazamiento = DireccionVirtual - InicioBloque
+
+direccionFisica = NumeroBloque + desplazamiento 
