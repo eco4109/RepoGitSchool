@@ -38,7 +38,7 @@ int main(){
   server.sin_family = AF_INET; //asignacion del protocolo
   server.sin_port = htons(puerto); //asignacion del puerto
   bcopy((char *)servidor->h_addr, (char *)&server.sin_addr.s_addr, sizeof(servidor->h_length));
-  //bcopy(); copia los datos del primer elemendo en el segundo con el tamaño máximo 
+  //bcopy(); copia los datos del primer elemendo en el segundo con el tamaño máximo
   //del tercer argumento.
 
 
@@ -68,13 +68,14 @@ int main(){
     //scanf("%s", buffer);
     printf("\tPotroBus state: %s\n", buffer2);
   	//send(conexion, buffer, 100, 0); //envio
+    usleep(60000000);
+    //usleep(1500000);
     send(conexion, buffer2, 100, 0); //envio
-    usleep(1500000);
-    //printf("Se envio: %s\n",buffer );
+    printf("Se envio: %s\n",buffer );
   	//bzero((char * )&buffer, sizeof(buffer));
     //recv(conexion, buffer, 100, 0); //recepción
-  	//printf("%s", buffer);
-  }  
+  	//printf("Imprimir%s", buffer);
+  }
 
 return 0;
 }

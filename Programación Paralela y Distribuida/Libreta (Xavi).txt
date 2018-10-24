@@ -1,0 +1,63 @@
+COMPILADORES PARALIZADORES
+========================================================
+
+Debido a que uin programa secuencia es una forma de especificar todas las operaciones de computo, este se puede tomar comp unto de partida para analizar el paralelismo potencial de un computo
+
+Se ha realizado un considerable trabajo teorico y practico en este problema, esto es, comenrzar on un programa secuencial, analizar y reestructurar lo de tal manera que haga todo lo posiblr para que la mayoria de las cosas se realicen en paralelo.
+
+La mayoria de trabajos que se ha realizado es con respecto a los COMPILADORES PARALIZADORES 
+
+la pregunta que surge es la siguiente: 
+¿Como poder analizar el computo para determinar que operaciones se pueden hacer en paralelo?
+
+DESCUBRIR OPÉRACIONES PARALELAS DENTRO DE UN CODIGO SECUENCIAL
+
+DEPENDENCIA DE DATOS
+
+Las dependencias se pueden estudiar como varios niveles de computacion, tales como la computacion a nivel de instruccion, anivel de varianbles y aún a nivel de bits.
+
+DEPENDENCIAS ENTRE INSTRUCCIONES Y VARIABLES 
+
+Se pueden identifica tres diferentes tipos de dependencias
+* Dependencias de flujo de datos(DFD)
+* Antidependenciasde datos(ADD)
+* Dependencias de datos de salidas(DDS)
+
+
+DEPENDENCIA DE FLUJO DE DATOS(DFD)
+Dependencia verdadera
+Una instruccion no puede ser ejecutada hasta despues de otra, debido a que la segunda instruccion requiere un valor calculado por la primera instruccion
+
+S
+
+S1:  X= ...				--------->
+S2:  ...=X
+
+ANTIDEPENDENCIA DE DATOS(ADD)
+El valor de una variable producida en una instruccion ha sido usado previamente en otra instruccion o en la misma instruccion 
+
+S´
+
+S1:  ... = X			-----/---->
+S2:  X= ...
+
+
+DEPENDENCIA DE DATOS DE SALIDA (DDS)
+
+Dos instrucciones producen los mismo valores
+
+s° 
+
+S1:   X=...			-----O---->
+S2    X=...
+
+GRAFICA DE DEPENDENCIAS DE DATOS(GDD)
+
+Esta grafica está definida como una gráfica dirigida G=(V,E)
+con los vertices V correspondientes a las instrucciones del programa y a los arcos E representando las dependencias de los datos entre las instrucciones
+
+EJEMPLO:
+Considerese la ejecucion de una simple secuencia de instrucciones:
+A = B+C
+B = A+E
+A = A+B
