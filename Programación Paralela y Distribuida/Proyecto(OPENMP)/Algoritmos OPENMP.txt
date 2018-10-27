@@ -1,0 +1,632 @@
+/*
+	Programación Paralela y Distribuida
+	Diego Escorza García
+	Algoritmos OPENMP
+*/
+
+=======================================  ALGORTIMO 1 ================================================
+
+#include <stdio.h>
+#include <math.h>
+#include <omp.h>
+
+int main(){ //Programa Principal
+	int i,j,k,n,eleva;
+
+	printf("\n\n\t--------------------  SUMA EREW  --------------------\n");
+    //Determinar el tamaño del vector
+    do{
+        printf("\n\tIngresa el tama%co del vector (Potencias de 2): ",164);
+        scanf("%d",&n); //Leyendo el número solicitado
+        if((n<2) && ((pow(2,log2(n))))!=n){
+            printf("\7");
+        }
+        int log = log2(n);
+        eleva = pow(2,log);
+    }while((n<2) || (eleva!=n)); //En la condicion delñ while se asegura de solo recibir 
+    //numeros mayores a 1 y potencias de 2, si no, no jala con otyros tamaños de vectores jeje 
+    //Declarar el vector A , de tamaño n
+    int A[n];
+    A[0] = 0;
+    //Llenar el vector A
+    for(int t =1; t<=n;t++){
+        printf("\n\tIngresa el valor numero %d: ",t);
+        scanf("%d",&A[t]); //Leyendo el número solicitado
+    }
+    //Im´rimimos el vector inicial
+	printf("\n\tVector Inicial: ");
+	printf ( "[");
+	for ( k = 1; k <=n; k ++)	{
+		printf ("  %d  ", A [k] );
+    }
+    printf ( "]");
+    printf ( "\n" );
+
+    //Empezamos con los calculos
+	for( i = 1; i <= (log2 (n)); i++){
+        printf("\n\n\tPASO %d: \n", i);
+        #pragma omp parallel  shared (j)
+        {
+            #pragma omp for
+            for ( j  = 1; j <= (n/2); j++){
+                if( ( (2*j) % ( int ) ( pow ( 2, i ) ) ) == 0) {
+                    A [2*j] = A [2*j] + A [ ( 2 * j ) - ( ( int ) ( pow ( 2, (i - 1 ) ) ) ) ];
+                }
+
+            }
+        }
+            printf ( "\n" );
+            printf ( "\t[");
+            for(k=1;k<=n;k++)        {
+                printf(" %d ",A[k]);
+            }
+            printf ( " ]");
+      }
+      printf("\n\n\n\tEl resultado es: %d\n", A[n]);
+}
+
+
+
+
+=======================================  ALGORTIMO 2 ================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <omp.h>
+
+int main(){ //Programa principal
+
+	int i,j,k,u, n,q, eleva;
+
+	printf("\t--------------------  SUMA CREW  --------------------\n");
+	//Determinar el tamaño del vector
+	do{
+		printf("\n\tIngresa el tama%co del vector (Potencias de 2): ",164);
+        scanf("%d",&n); //Leyendo el número solicitado
+        if((n<2) && ((pow(2,log2(n))))!=n){
+            printf("\7");
+        }
+        int log = log2(n);
+        eleva = pow(2,log);
+    }while((n<2) || (eleva!=n)); //En la condicion delñ while se asegura de solo recibir 
+
+    int b[n]; //Vector auxiliar
+    int A[n]; //Vector principal
+
+    //Llenar el vector A
+    for(int t =0; t<n;t++){
+        printf("\n\tIngresa el valor numero %d: ",t+1);
+        scanf("%d",&A[t]); //Leyendo el número solicitado
+    }
+    //Im´rimimos el vector inicial
+	printf("\n\tVector Inicial: ");
+	printf ( "[");
+	for ( k = 0; k <n; k ++)	{
+		printf ("  %d  ", A [k] );
+    }
+    printf ( "]\n\n");
+
+    for(u=0;u<n;u++){
+        b[u]=A[u];
+    }
+
+    for(i=1;i<=int(log2(n));i++){
+    	printf("\tPaso %d: ",i );
+        #pragma omp parallel shared(j)// #pragma omp single
+        {
+             #pragma omp  for//#pragma omp parallel  for
+            for(j=(int)(pow(2,i-1));j<=n;j++){
+                b[j]=A[j]+ A[ (j) - (int)(pow(2,(i-1))) ];
+                //printf("j:%d\n",j);
+            }
+        }
+        printf ( "\n\t[ ");
+        for(k=0;k<n;k++){
+            printf("  %d  ",b[k]);
+        }
+        printf ( " ]\n");
+        for (u=0;u<n;u++){
+            A[u]=b[u];
+        }
+     }
+
+    printf("\n\n\n\tEl Resultado: %d\n",b[n-1]);
+}
+
+
+
+=======================================  ALGORTIMO 3 ================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <omp.h>
+
+void Broadcast(int Temp[],int num,int n){
+    int u,i,j;
+    Temp[0]=num;
+    Temp[1]=num;
+
+    for(i=1;i<=(int)(log2(n));i++){
+        #pragma omp parallel  shared(j,i)
+        {
+            for(j=((int)(pow(2,i-1))+1);j<=(int)(pow(2,i));j++){
+                Temp[j]=Temp[(j) - (int)(pow(2,(i-1)))];
+            }
+        }
+    }
+}
+void SearchPram(int Temp[],int L[],int n){
+    int i;
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for(i=0;i<=n;i++){
+        if(i<n){
+            if(L[i]==Temp[i]){
+                Temp[i]=i+1;
+            }else{
+                Temp[i]=88888;
+            }
+        }
+    }
+    }
+
+}
+void MinPram(int Temp[],int n){
+    int i,j;
+    for(i=1;i<=(int)(log2(n));i++){
+            #pragma omp parallel
+            {
+                 for(j=1;j<=(n/((int)(pow(2,j))));j++){
+                    if(Temp[(int)(pow(2,j))-1]>Temp[(int)(pow(2,j))]){
+                        Temp[j]=Temp[(int)(pow(2,j))];
+                    }else{
+                    Temp[j]=Temp[(int)(pow(2,j))-1];
+                    }
+                }
+            }
+
+    }
+}
+int main(){ //Menú principal
+
+    printf("\n\n\t--------------------  BUSQUEDA PRAM EREW  --------------------\n");
+    int n,i,k,num,h,pos,t,aux,m,aux2, salida;
+    do{
+        printf("\n\tIngresa el tama%co del vector: ",164);
+        scanf("%d",&n); //Leyendo el número solicitado
+    }while(n<2); //En la condicion delñ while se asegura de solo recibir 
+    printf("\n");
+    int L[n];
+    int Temp[n];
+    //int L[16]={2,-1,23,-4,2,5,-2,0,5,1,5,-5,8,5,3,-2};
+    //int Temp[16];
+    for(int t =0; t<n;t++){
+        do{
+        	salida = 0;
+        	printf("\n\tIngresa el valor numero %d: ",t+1);
+	        //Hay que verificar que ese valor NO esté en el vector ya, para que lo haga bien.
+	        scanf("%d",&aux); //Buscar aux en los valores del vector ingresados hasta ahora
+	        if(t == 0){
+	        	L[t] = aux;
+	        	break;
+	        }
+	        for (int aux2 = 0; aux2 < t ; aux2++){
+	        	if(L[aux2] == aux){
+	        		printf("\n\tEse valor ya está en el vector, insertar otro\n");
+	        		salida = 0;
+	        		break;
+	        	}else{
+	        		salida = 1;
+	        	}
+	        }
+        }while(salida == 0);
+        L[t] = aux;
+        //scanf("%d",&L[t]); //Leyendo el número solicitado
+    }
+
+    //n=16;
+	printf("\n\n\tVector Inicial: ");
+	printf ( "[");
+	for ( k = 0; k < n; k ++)
+	{
+		printf ("  %d  ", L [k] );
+    }
+    printf ( "]");
+    printf ( "\n" );
+    printf("\n\tIngresa el numero a buscar: ");
+	scanf("%d",&num);
+	Broadcast(Temp,num,n);
+	printf("\n\tVector temporal: ");
+	printf ( "[");
+	for ( k = 0; k < n; k ++)
+	{
+		printf ("  %d  ", Temp [k] );
+    }
+    printf ( "]\n");
+    SearchPram(Temp,L,n);
+    printf("\n\tIndices:");
+    printf ( "[");
+	for ( k = 0; k < n; k ++)
+	{
+		printf ("  %d  ", Temp [k] );
+    }
+    printf ( "]");
+    MinPram(Temp,n);
+    h=1;
+    while(h<16){
+        if(Temp[h]!=88888){
+            pos=Temp[h];
+            break;
+        }
+        h=h+1;
+    }
+    if (pos == 0){
+    	printf("\n\n\n\tEl valor: %d NO se encuentra en el vector.\n",num);
+    }else{
+    	printf("\n\n\n\tEl valor: %d se encuentra en la posicion: %d \n", num, pos);
+    }
+}
+
+
+
+=======================================  ALGORTIMO 4 ================================================
+#include <stdio.h>
+#include<math.h>
+#include <omp.h>
+
+using namespace std;
+void minCRCW(int L[], int n,int Win[]){
+    int i,j;
+    #pragma omp parallel
+	{
+	    #pragma omp parallel for
+	   for( i=0 ; i<n ; i++){
+            Win[i]=0;
+        }
+	}
+    #pragma omp parallel for shared(i)
+    for (i=0;i<n;i++){
+        #pragma omp parallel for  private(j)
+        for (j=i+1;j<n;j++){
+            if(i<j){
+                if(L[i]>L[j]){
+                    Win[i]=1;
+                }else{
+                    Win[j]=1;
+                }
+            }
+        }
+    }
+
+}
+int main()
+{
+    int i, j, IndexMin,n,num,k;
+    printf("\n\t--------------------  BUSQUEDA PRAM CRCW --------------------\n\n");
+    printf("\tDe que tamanio sera el vector?: ");
+    scanf("%d",&n);
+    int L[n],Win[n];
+    for(i=0;i<n;i++){
+		printf("\n\tIngrese el dato %d: ",i+1);
+		scanf("%d",&num);
+		L[i]=num;
+	}
+	printf("\n\n\tVector Inicial: ");
+	printf ( "[");
+	for(k=0;k<n;k++){
+        printf ("  %d  ", L[k] );
+	}
+	printf ( "]\n");
+	minCRCW(L,n,Win);
+	printf("\n\tVector WIN: ");
+	printf ( "[");
+	for(k=0;k<n;k++){
+        printf ("  %d  ", Win[k] );
+	}
+	printf ( "]");
+	#pragma omp parallel
+	{
+	    #pragma omp parallel for
+	    for( i=0 ; i<n ; i++ ){
+            if( Win[i]==0 ){
+                IndexMin=i;
+            }
+        }
+	}
+
+	printf("\n\n\tEl valor mimino es:  %d\n",L[IndexMin]);
+}
+
+
+
+=======================================  ALGORTIMO 5 ================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include<omp.h>
+
+
+main(){
+	printf("\n\t--------------------  ORDENAMIENTO CRCW  --------------------\n");
+	int i, j,n,x,w;
+	 printf("\n\tCuantos datos desea introducir: ");
+	scanf("%d",&n);
+	printf("\n");
+	int L[n],Win[n];
+	for(i=0;i<n;i++){
+		printf("\n\tIngrese el valor %d: ",i+1);
+		scanf("%d",&x);
+		L[i]=x;
+	}
+	printf("\n\n\n\tVector Inicial: ");
+	printf ( "[");
+	for(i=0 ; i<n ; i++){
+		printf("  %d  ",L[i]);
+	}
+    printf ( "]");
+	#pragma omp parallel
+	{
+	    #pragma omp for
+	    for( i=0 ; i<n ; i++){
+            Win[i]=0;
+        }
+	}
+	#pragma omp parallel for shared(i)
+    for (i=0;i<n;i++){
+        #pragma omp parallel shared(j)
+        {
+            #pragma omp  for
+            for(j=1;j<n;j++){
+                if(i<j){
+                    if(L[i]>L[j]){
+                        Win[i]=Win[i]+1;
+                    }else{
+                        Win[j]=Win[j]+1;
+                    }
+                }
+            }
+
+        }
+    }
+
+    int a;
+    int ll[n];
+	#pragma omp parallel shared (i)
+	{
+	    #pragma omp for
+	    for( i=0 ; i<n ; i++ ){
+            a= Win[i]+1;
+            ll[a-1]= L[i];
+        }
+
+	}
+
+	printf("\n\n\tVector WIN: ");
+	printf ( "[");
+	for(i=0 ; i<n ; i++){
+		printf("  %d  ",Win[i]);
+	}
+	printf ( "]");
+	printf("\n\n");
+	printf("\n\tVector Ordenado: ");
+	printf ( "[");
+	for(i=0 ; i<n ; i++){
+		printf("  %d  ",ll[i]);
+	}
+	printf ( "]\n");
+}
+
+
+
+
+=======================================  ALGORTIMO 6 ================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <omp.h>
+
+void oddEvenSplit(int L[],int odd[],int even[],int INI,int n){
+   int cont1=1,cont2=1;
+        for(int i=INI;i<=n;i++){
+            if((i%2)==0){
+                even[cont1]=L[i];
+                cont1++;
+            }else{
+                odd[cont2]=L[i];
+                cont2++;
+            }
+        }
+}
+
+void oddEvenMerge(int L[],int ini,int n){
+    int odd[16];
+    int even[16];
+    int fin=n-ini+1;
+    int au=(int)((fin/2)+1);
+    int aux;
+    if(fin==2){
+        if(L[ini]>L[n]){
+                aux=L[ini];
+                L[ini]=L[n];
+                L[n]=aux;
+        }
+    }else{
+        #pragma omp parallel
+        #pragma omp task
+        oddEvenSplit(L,odd,even,ini,n);
+        #pragma omp parallel
+            {
+                #pragma omp task
+                oddEvenMerge(odd,1,(fin/2));
+                oddEvenMerge(even,1,(fin/2));
+
+            }
+
+        #pragma omp parallel
+			{
+			    #pragma omp for
+                for(int i=1;i<=(fin/2);i++){
+                    L[(2*i)-1+(n-fin)]=odd[i];
+                    L[(2*i)+(n-fin)]=even[i];
+                }
+			}
+        #pragma omp parallel
+			{
+			    #pragma omp for
+                for(int i=ini;i<=((n/2)-1);i++){
+                    if(L[2*i]>L[(2*i)+1]){
+                        int aux;
+                        aux=L[2*i];
+                        L[2*i]=L[(2*i)+1];
+                        L[(2*i)+1]=aux;
+                    }
+                }
+			}
+    }
+}
+void mergeS(int L[],int ini,int n){
+    int m=(n+ini)/2;
+    if(ini<n){
+         #pragma omp parallel
+            {
+                #pragma omp task
+                mergeS( L,ini, m);
+                mergeS( L, m+1, n);
+                oddEvenMerge(L,ini,n);
+            }
+    }
+}
+
+
+
+
+int main(){
+    printf("\n\t--------------------  ORDENAMIENTO EREW  --------------------\n");
+    int i,j,x,n,l,eleva;
+    //Determinar el tamaño del vector
+    do{
+        printf("\n\tIngresa el tama%co del vector (Potencias de 2): ",164);
+        scanf("%d",&l); //Leyendo el número solicitado
+        if((l<2) && ((pow(2,log2(l))))!=l){
+            printf("\7");
+        }
+        int log = log2(l);
+        eleva = pow(2,log);
+    }while((l<2) || (eleva!=l)); //En la condicion delñ while se asegura de solo reci
+	
+	int L[l];
+	L[0] = 0;
+
+	for(int t =1; t<=l;t++){
+        printf("\n\tIngresa el valor numero %d: ",t);
+        scanf("%d",&L[t]); //Leyendo el número solicitado
+    }
+	n=log2(l);
+	printf("\n\n\tVector Incial: ");
+	printf ( "[");
+	for(i=1 ; i<=l ; i++){
+		printf("  %d  ",L[i]);
+	}
+    printf ( "]\n");
+    mergeS(L,1, l);
+    printf ("\n\tVector Ordenado: ");
+    printf ( "[");
+	for(i=1 ; i<=l ; i++){
+		printf("    %d    ",L[i]);
+	}
+    printf ( "]\n\n");
+}
+
+
+
+=======================================  ALGORTIMO 7 ================================================
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <omp.h>
+
+void imprimeMatriz(int Mtrx[][2]){ //Funcion para pintar una matriz de 2x2 así bien bonito
+	for (int a = 0; a < 2; ++a){
+		printf("\t");
+		for (int b = 0; b < 2; ++b){
+			printf("[ %d ] ",Mtrx[a][b]);
+		}
+		printf("\n");
+	}
+}
+
+
+int main(){
+   printf("\n\t----------  MULTIPLICACION DE MATRCES CREW  ----------\n");
+	int i, l , j, k, x, A[2][2], B[2][2],C[2][2][2],C2[2][2][2];
+	printf("\n\tLlenado de la Matriz A:\n");
+	i=0;
+	while(i<2){
+		j=0;
+		while(j<2){
+			printf("\n\tIngrese el valor de la celda (%d,%d): ",i+1,j+1);
+			scanf("%d",&x);
+			A[i][j]=x;
+			j++;
+		}
+		i++;
+	}
+	printf("\n\tLa Matriz A queda así: \n\n");
+	imprimeMatriz(A);
+
+	printf("\n\n\n\tLlenado de la Matriz B:\n");
+	i=0;
+	while(i<2){
+		j=0;
+		while(j<2){
+			printf("\n\tIngrese el valor de la celda (%d,%d): ",i+1,j+1);
+			scanf("%d",&x);
+			B[i][j]=x;
+			j++;
+		}
+		i++;
+	}
+	printf("\n\tLa Matriz B queda así: \n\n");
+	imprimeMatriz(B);
+
+
+
+	#pragma omp parallel
+	{
+	    #pragma omp for private (k)
+	    for (k=0;k<2;k++){
+            #pragma omp parallel for private(i)
+            for(i=0;i<2;i++){
+                #pragma omp parallel for private(j)
+                for(j=0;j<2;j++){
+                    C[k][i][j]=A[i][k]*B[k][j];
+                }
+            }
+	    }
+	}
+
+    for(l=0;l<log2(4.0);l++){
+        #pragma omp parallel
+        {
+        #pragma omp parallel for shared(C) private(i)
+        for(i=0;i<2;i++){
+            #pragma omp parallel for private(j)
+            for(j=0;j<2;j++){
+                #pragma omp parallel for private(k)
+                for(k=0;k<1;k++){
+                    if( ( 2*k % 2^l )==0 ){
+                        C2[2*k][i][j] = C[2*k][i][j] + C[ 2*k - 2^(l-1) ][i][j] ;
+                    }
+                }
+            }
+        }
+        }
+
+    }
+
+	printf("\n\n\tResultado de A x B: \n\n");
+	printf("\t[ %d  %d ]       [ %d  %d ]        [ %d  %d ]\n", A[0][0], A[0][1], B[0][0], B[0][1], C2[0][0][0] , C2[0][0][1] );
+	printf("\t           X 	           =\n");
+	printf("\t[ %d  %d ]       [ %d  %d ]        [ %d  %d ]", A[1][0], A[1][1], B[1][0], B[1][1], C2[0][1][0] , C2[0][1][1] );
+}
