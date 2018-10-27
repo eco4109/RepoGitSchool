@@ -14,14 +14,7 @@ int main(){
   char * idPortC = "5555";
   printf("\tEnter the IP address of the Server, plox: ");
   scanf("%s", ipAddress);
-  //printf("\tEnter the ID PORT of the Server, plox: ");
-  //scanf("%s", idPortC);
-  //printf("\tThe IP is: : %s\n",ipAddress);
-  //printf("\tThe port is: %s\n",idPortC);
-  /*if(argc<2){
-    printf("<host> <puerto>\n");
-    return 1;
-  }*/
+
   struct sockaddr_in server; //Declaración de la estructura con información para la conexión
   struct hostent *servidor; //Declaración de la estructura con información del host
   servidor = gethostbyname(ipAddress); //Asignacion
@@ -34,7 +27,6 @@ int main(){
   conexion = socket(AF_INET, SOCK_STREAM, 0); //Asignación del socket
   puerto=(atoi(idPortC)); //conversion del argumento
   bzero((char *)&server, sizeof((char *)&server)); //Rellena toda la estructura de 0's
-        //La función bzero() es como memset() pero inicializando a 0 todas la variables
   server.sin_family = AF_INET; //asignacion del protocolo
   server.sin_port = htons(puerto); //asignacion del puerto
   bcopy((char *)servidor->h_addr, (char *)&server.sin_addr.s_addr, sizeof(servidor->h_length));
