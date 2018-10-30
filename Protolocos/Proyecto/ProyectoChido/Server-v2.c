@@ -66,7 +66,7 @@ int main(){
 	int i = 0; //VAriable para recorrer e vector de conexiones
 	printf("\n\n\n\t=============================  CLIENT CONNECTIONS :D (Server)  =============================\n\n");
 	printf("\tFirst, I'll wait for Connection (Bus Stops) ...\n" );
-	while(noConexiones < 2){ //Empieza e ciclo para establecer las conexiones con clientes
+	while(noConexiones < 1){ //Empieza e ciclo para establecer las conexiones con clientes
 		//Se acepta alguna conexion y se guarda en "cliente" OJO, NO se guarda en "conexion_cliente"
 		//eso es por que a funcion "accept" regresa un 0 si NO se ha hecho la conexion bien
 		conexion_clienteBS[i] = accept(conexion_servidor, (struct sockaddr *)&cliente, &longc2); //Esperamos una conexion
