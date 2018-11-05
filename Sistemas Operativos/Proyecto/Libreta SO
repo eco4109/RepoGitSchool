@@ -92,7 +92,7 @@ Tarea 17/10/18
 -Generar un subproceso que alimente la cola, y la computadora virtual tiene que checar la cola o generar un toque a la computadora cuando esta tenga un elemento
 *Investigar el sinchronize de java
 
-
+https://docs.oracle.com/javase/tutorial/essential/concurrency/syncmeth.html
 
 
 

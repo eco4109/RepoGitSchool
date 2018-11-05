@@ -14,7 +14,7 @@ class quantum{
 			diferencia = horaSistema - horaInicial;	
 			//System.out.println(diferencia);
 			if((diferencia >= quantum - 10)&&(diferencia <= quantum +10)){
-				System.out.println("¡INTERRUPCIÓN  :D  !\7");
+				System.out.println("INTERRUPCION !\7");
 				horaInicial = horaSistema;
 				cola.insertarCola(1);
 				//System.out.println("Press Any Key To Continue...");
@@ -32,15 +32,15 @@ class cola{
 	public static void inicializarCola(){ //Fución para iniciar la cola y los apuntadores
 		inicioC = -1;
 		finC = -1;
-		System.out.println("\n\nCola inicializada, presiona para continuar ... ...\n");
+		System.out.println("\n\npresiona para continuar ... ...\n");
 		new java.util.Scanner(System.in).nextLine();
 	}
 
 	public static void insertarCola(int dato){ //Inserta en la cola un entero
 		if((finC == max-1 && inicioC == 0) || (finC+1==inicioC)){
-			System.out.println("\n¡COLA LLENA:\n");
+			System.out.println("\nCOLA LLENA:\n");
 			mostrarCola();
-			System.out.println("\n¡TERMINA PROGRAMA!\n");
+			System.out.println("\nTERMINA PROGRAMA");
 			System.exit(0);
 		}
 		if(finC==max-1 && inicioC!=0){
@@ -60,7 +60,7 @@ class cola{
 
 	public static void removerCola(){ //Remover un elemento de a cola
 		if(inicioC==-1) {
-			System.out.println("\n¡COLA VACIA!\n");
+			System.out.println("\nCOLA VACIA\n");
 			return;
 		}
 		System.out.println("Dato eliminado correctamente: "+cola[inicioC]);
@@ -79,7 +79,7 @@ class cola{
 
 	public static void mostrarCola(){ //Muestra la cola
 		if(inicioC == -1 ){
-			System.out.println("\n¡COLA VACIA!\n");
+			System.out.println("\nCOLA VACIA\n");
 		}else{
 			int i=inicioC;
 			System.out.print("\n\nVolcado de la Cola: [");
@@ -99,13 +99,6 @@ class cola{
 		}
 	}
 }
-
-
-
-
-
-
-
 public class quantumcola{
 	public static void main(String[] args){
 		cola.inicializarCola();
