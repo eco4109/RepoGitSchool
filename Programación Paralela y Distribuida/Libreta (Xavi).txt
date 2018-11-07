@@ -1,4 +1,4 @@
-COMPILADORES PARALIZADORES
+﻿COMPILADORES PARALIZADORES
 ========================================================
 
 Debido a que uin programa secuencia es una forma de especificar todas las operaciones de computo, este se puede tomar comp unto de partida para analizar el paralelismo potencial de un computo
@@ -61,3 +61,55 @@ Considerese la ejecucion de una simple secuencia de instrucciones:
 A = B+C
 B = A+E
 A = A+B
+
+
+==============================================================================================================================
+
+6 de Noviembre de 2018
+
+CONDICIONES DE BERNSTEIN
+
+Conjunto de condiciones formales que determinan si dos instrucciones pueden ser ejecutadas en paralelo
+Sea Ii el conjunto de variables de entrada a la instruccion Si(readSer) y sea Ai el conjunto de variables de salida de la instruccion Si(writeset)
+Entonces tenemos lo siguiente
+
+1) Ii (interseccion) Aj = 0; antidependencia
+2) Ij (interseccion) Ai = 0; flujo
+3) Ai (interseccion) Aj = 0; flujo
+
+Si se verifican las condiciones anteriores Si y Sj pueden ejecutarse en paralelo, lo cual se denota como Si || Sj
+
+PROPIEDADES DE LA RELACION DE PARALELISMO 
+
+
+*Conmutativa 
+Si || Sj <--------> Sj || Si
+
+*No transitiva
+Si || Sj y Sj || Sk No implica que Si || Sk
+
+*Asociativa
+(Si || Sj) || Sk ----->  Si || (Sj || Sk)
+
+
+Por lo tanto, la relacion || no es una relacion de equivalencia
+
+
+EJEMPLO
+
+
+Detectar que instrucciones del siguiente codigo pueden ejecutarse en paralelo
+
+S1: x := y+1
+s2: y := x-2
+s3: z := a+b-7
+
+
+
+1)
+
+Detectar que variables acceden en modo lectura
+
+S1 ----> I1 = {y}
+S2 ----> I2 = {x}
+s3 ----> I3 = {a,b}
