@@ -529,19 +529,10 @@ public class pc{
 		for (int i = 0; i<=13 ; i++) {
 		 	R[i] = 0;
 		 } 
-		 
-		 COMPAQ.start();
-		 interrumpe.start();
-		/* while(!PSW[14]){
-		 	//dump(0);
-		 	capta();
-		 	traduce();
-		 	ejecuta();
-		 	//pausa();
-		 	//dump(0);
-		 }
-		 System.out.println("Termino la computadora virtual.");*/
-
+		//Inicializar vector de interrupciones
+		cola.inicializarCola();
+		COMPAQ.start();
+		interrumpe.start();
 	}
 
 	public static void escribeDisco(){
@@ -657,8 +648,11 @@ class Computadora extends Thread{
 			pc.capta();
 		 	pc.traduce();
 		 	pc.ejecuta();
-		 	if(pc.CPUInt)
-		 		pc.dump(0);
+		 	System.out.println("Un Ciclo de Fetch Terminado ... ");
+		 	if(pc.CPUInt){
+		 		//pc.dump(0);
+		 		System.out.println("\7Fetch Interrumpido ... ");
+		 	}	
 			pc.CPUInt = false;
 		 	
 		}
@@ -667,15 +661,119 @@ class Computadora extends Thread{
 }
 
 class Interrupcion extends Thread{
-	public void run(){
-		 Random generadorAleatorios = new Random();
+	public void run(){ //Genera la interrupcion de justicia, alterna entre procesos
+		long quantum = 500; //Interrupción de justicia
+		
+			long horaSistema, horaInicial, diferencia;
+			horaInicial = System.currentTimeMillis();
+			while(true){
+				horaSistema = System.currentTimeMillis();
+				diferencia = horaSistema - horaInicial;	
+				//System.out.println(diferencia);
+				if((diferencia >= quantum - 10)&&(diferencia <= quantum +10)){
+					//pc.CPUInt = true;
+					System.out.println("INTERRUPCION !\7");
+					cola.insertarCola(1);
+					horaInicial = horaSistema;					
+					//System.out.println("Press Any Key To Continue...");
+					//new java.util.Scanner(System.in).nextLine();
+			}
+		}
+	
+
+
+
+
+
+
+		/*Random generadorAleatorios = new Random();
 		while(true){
-			//System.out.println(generadorAleatorios.nextInt(100));
+		//System.out.println(generadorAleatorios.nextInt(100));
 			if (generadorAleatorios.nextInt(10000000)==5469){
 				pc.CPUInt = true;
 			}
+		}*/
+	}
 
+}
+
+
+
+class cola{
+	static int max = 10; //Tamaño máximo de la cola
+	static int[] cola = new int[max]; //Definición de la cola circular de tamaño "n"
+	static int inicioC, finC; //Indicadores del inicio y final de la cola
+	static int noElementos; //Contador de numero de elementos en la cola
+
+	public static void inicializarCola(){ //Fución para iniciar la cola y los apuntadores
+		inicioC = -1;
+		finC = -1;
+		System.out.println("\n\nCola inicializada resiona para continuar ... ...\n");
+		new java.util.Scanner(System.in).nextLine();
+	}
+
+	public static void insertarCola(int dato){ //Inserta en la cola un entero
+		if((finC == max-1 && inicioC == 0) || (finC+1==inicioC)){
+			System.out.println("\nCOLA LLENA:\n");
+			mostrarCola();
+			System.out.println("\nTERMINA PROGRAMA");
+			System.exit(0);
+		}
+		noElementos ++;
+		if(finC==max-1 && inicioC!=0){
+			finC = 0;
+		}else{
+			finC++;
+		}
+
+		cola[finC] = dato;
+		System.out.println("Dato insertado correctamente: "+dato+" Datos en la cola: "+noElementos);
+
+		
+		if(inicioC==-1){
+			inicioC = 0;
 		}
 	}
 
+	public static void removerCola(){ //Remover un elemento de a cola
+		if(inicioC==-1) {
+			System.out.println("\nCOLA VACIA\n");
+			return;
+		}
+		System.out.println("Dato eliminado correctamente: "+cola[inicioC]);
+		noElementos = noElementos -1;
+		if(inicioC==finC){
+			inicioC=-1;
+			finC=-1;
+			return;
+		}
+		if(inicioC==max){
+			inicioC=0; 
+		}else {
+			inicioC++;
+		}
+	}
+
+
+	public static void mostrarCola(){ //Muestra la cola
+		if(inicioC == -1 ){
+			System.out.println("\nCOLA VACIA\n");
+		}else{
+			int i=inicioC;
+			System.out.print("\n\nVolcado de la Cola: [");
+			do {
+				System.out.print(" "+cola[i]+" ");
+				i++;
+				if(i==max && inicioC>finC){
+					i=0; // Reiniciar en cero (dar la vuelta)	
+				} 
+			}while(i!=finC+1);
+			System.out.println("]");
+			//System.out.println("Inicio: "+inicioC);
+			//System.out.println("Fin: "+fin);
+			//System.out.println("Max: "+max);
+			System.out.println("\nCola volcada, presiona para continuar ... ...\n");
+			new java.util.Scanner(System.in).nextLine();
+		}
+	}
 }
