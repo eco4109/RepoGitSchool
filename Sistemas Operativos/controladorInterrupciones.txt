@@ -1,0 +1,10 @@
+Proceso 3: controlador de interrupciones
+
+controladorInter()
+  mientras(true):
+    mientras(dormido(3));
+    mientras(n == 0);
+    CPU.int = true;
+    dormir(3);
+  finMientras;
+finFunction;

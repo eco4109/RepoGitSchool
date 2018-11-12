@@ -1,0 +1,625 @@
+PROGRAMA 1
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ErewSuma
+{
+    class Program
+    {
+        public static int[] numbers;
+        public static int n;
+        public static bool ban = true;
+        public static void Main(string[] args)
+        {
+            int i;
+            numbers = new int[8];
+            n = 8;
+
+            Console.WriteLine("\n\tSuma EREW");
+            for (i = 0; i < 8; i++)
+            {
+                Console.Write("\nEscribe el numero {0} de 8: ", i+1);
+                numbers[i] = int.Parse(Console.ReadLine());
+            }
+               for (i = 1; i <= Math.Log(numbers.Length, 2); i++)
+                {
+                    Parallel.For(1, (n / 2) + 1, j =>
+                    {
+
+                        if (((2 * j) % (Math.Pow(2, i))) == 0)
+                        {
+                            numbers[(2 * j) - 1] = numbers[(2 * j) - 1] + numbers[((2 * j) - (int)Math.Pow(2, i - 1)) - 1];
+                        }
+
+                    });
+                    print();
+                }
+            Console.WriteLine("La suma es: " + numbers[numbers.Length - 1]);
+            Console.ReadKey();
+        }
+
+        public static void print()
+        {
+            for (int i = 0; i < numbers.Length; i++)
+            {
+                Console.Write(numbers[i]);
+                if (i != (numbers.Length - 1))
+                    Console.Write(",");
+            }
+            Console.WriteLine();
+        }
+
+    }
+}
+
+=========================================================================================================
+
+
+PROGRAMA 2
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace AllSums_CREW
+{
+    class Program
+    {
+        public static int[] numbers;
+        public static int n;
+        public static CountdownEvent _countDown;
+
+        static void Main(string[] args)
+        {
+
+            int i;
+            numbers = new int[8];
+            n = 8;
+
+            Console.WriteLine("\n\tSumas CREW");
+            for (i = 0; i < 8; i++)
+            {
+                Console.Write("\nEscribe el numero {0} de 8: ", i + 1);
+                numbers[i] = int.Parse(Console.ReadLine());
+            }
+
+                for (i = 1; i <= Math.Log(n, 2); i++)
+                {
+                    _countDown = new CountdownEvent(n - (int)Math.Pow(2, i - 1));
+
+                    Parallel.For((int)Math.Pow(2, i - 1) + 1, n + 1, j =>
+                    {
+                        int r = numbers[j - 1] + numbers[(j - (int)Math.Pow(2, i - 1)) - 1];
+                        _countDown.Signal();
+
+                        _countDown.Wait();
+                        numbers[j - 1] = r;
+                    });
+                    print(numbers);
+                }
+            Console.WriteLine("La suma es: " + numbers[7]);
+            Console.ReadKey();
+        }
+
+        public static void print(int[] L)
+        {
+            for (int i = 0; i < L.Length; i++)
+            {
+                Console.Write(L[i]);
+                if (i != (L.Length - 1))
+                    Console.Write(",");
+            }
+            Console.WriteLine();
+        }
+
+    }
+}
+===================================================================================================
+
+
+PROGRAMA 3
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Busqueda_PRAM_EREW
+{
+    class Program
+    {
+        public static int n, buscar;
+        public static bool ban = true;
+        public static int[] A;
+        public static int[] L;
+
+        static void Main(string[] args)
+        {
+            n = 8;
+            L = new int[n];
+
+            Console.WriteLine("\n  Busqueda EREW");
+
+            for (int i = 0; i < 8; i++)
+            {
+                Console.Write("\nEscribe el numero {0} de 8: ", i + 1);
+                L[i] = int.Parse(Console.ReadLine());
+            }
+            A = new int[n];
+
+            Console.Write("\nNumero a buscar : ");
+            int.TryParse(Console.ReadLine(), out buscar);
+
+            BroadCast(buscar);
+
+            Parallel.For(1, n + 1, i =>
+            {
+                if (L[i - 1] == A[i - 1])
+                    A[i - 1] = i;
+                else
+                    A[i - 1] = 99999;
+
+                Console.Write("Vector L: ");
+                print(L);
+                Console.Write("Vector Temp: ");
+                print(A);
+            });
+            Console.WriteLine("Posicion : " + MinPRAM(A));
+            Console.ReadKey();
+        }
+
+        public static int MinPRAM(int[] L)
+        {
+            for (int j = 1; j <= Math.Log(L.Length, 2); j++)
+            {
+                Parallel.For(1, (L.Length / (int)Math.Pow(2, j)) + 1, i =>
+                {
+                    if (L[((2 * i) - 1) - 1] > L[(2 * i) - 1])
+                        L[i - 1] = L[(2 * i) - 1];
+                    else
+                        L[i - 1] = L[((2 * i) - 1) - 1];
+                });
+            }
+
+            Console.Write("Temp Final: ");
+            print(L);
+
+            return L[0];
+        }
+
+        public static void BroadCast(int x)
+        {
+            A[0] = x;
+            for (int i = 1; i <= Math.Log(A.Length, 2); i++)
+            {
+                Parallel.For((int)Math.Pow(2, i - 1) + 1, (int)Math.Pow(2, i) + 1, j =>
+                {
+                    A[j - 1] = A[(j - (int)Math.Pow(2, i - 1)) - 1];
+                });
+            }
+        }
+
+        public static void print(int[] pr)
+        {
+            for (int i = 0; i < pr.Length; i++)
+            {
+                Console.Write(pr[i]);
+                if (i != (pr.Length - 1))
+                    Console.Write(",");
+            }
+            Console.WriteLine();
+        }
+
+    }
+}
+
+====================================================================================================
+
+PROGRAMA 4
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Busqueda_PRAM_CRCW
+{
+    class Program
+    {
+        public static String numeros;
+        public static String[] num;
+        public static int[] numbers, win;
+        public static bool ban = true;
+        public static int n, j, indexMin;
+
+        static void Main(string[] args)
+        {
+
+            n = 8;
+            numbers = new int[n];
+
+            Console.WriteLine("\n  Busqueda CRCW");
+
+            for (int i = 0; i < 8; i++)
+            {
+                Console.Write("\nEscribe el numero {0} de 8: ", i + 1);
+                numbers[i] = int.Parse(Console.ReadLine());
+            }
+
+            win = new int[n];
+            indexMin = 0;
+
+                Parallel.For(0, n, i =>
+                {
+                    win[i] = 0;
+                });
+
+                Parallel.For(0, n, i =>
+                {
+                    Parallel.For(0, n, j =>
+                    {
+                        if (i < j)
+                        {
+                            if (numbers[i] > numbers[j])
+                                win[i] = 1;
+                            else
+                                win[j] = 1;
+                        }
+                    });
+                });
+
+                Console.Write("Win: ");
+                print(win);
+
+                Parallel.For(0, n, i =>
+                {
+                    if (win[i] == 0)
+                        indexMin = i;
+                });
+                Console.WriteLine("Elemento minimo : " + numbers[indexMin]);
+
+            Console.ReadKey();
+        }
+
+        public static void print(int[] L)
+        {
+            for (int i = 0; i < L.Length; i++)
+            {
+                Console.Write(L[i]);
+                if (i != (L.Length - 1))
+                    Console.Write(",");
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+
+======================================================================================
+PROGRAMA 5
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Ordenamiento_PRAM_CRCW
+{
+    class Program
+    {
+        public static int[] numbers, win;
+        public static int n;
+        public static CountdownEvent _countDown;
+
+        static void Main(string[] args)
+        {
+            n = 8;
+            numbers = new int[n];
+
+            Console.WriteLine("\n  ordenamiento CRCW");
+
+            for (int i = 0; i < 8; i++)
+            {
+                Console.Write("\nEscribe el numero {0} de 8: ", i + 1);
+                numbers[i] = int.Parse(Console.ReadLine());
+            }
+
+            win = new int[n];
+
+                Parallel.For(0, n, i =>
+                {
+                    win[i] = 0;
+                });
+
+                Parallel.For(0, n, i =>
+                {
+                    Parallel.For(0, n, j =>
+                    {
+                        if (i < j)
+                        {
+                            if (numbers[i] > numbers[j])
+                                win[i] = win[i] + 1;
+                            else
+                                win[j] = win[j] + 1;
+                        }
+                    });
+                });
+
+
+                _countDown = new CountdownEvent(n);
+                Parallel.For(0, n, i =>
+                {
+                    int r = numbers[i];
+                    _countDown.Signal();
+
+                    _countDown.Wait();
+                    numbers[win[i]] = r;
+                });
+
+                Console.Write("Win: ");
+                print(win);
+                Console.Write("L: ");
+                print(numbers);
+
+            Console.ReadKey();
+        }
+
+        public static void print(int[] L)
+        {
+            for (int i = 0; i < L.Length; i++)
+            {
+                Console.Write(L[i]);
+                if (i != (L.Length - 1))
+                    Console.Write(",");
+            }
+            Console.WriteLine();
+        }
+
+    }
+}
+
+
+=================================================================================================
+
+PROGRAMA 6
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+
+public class Ordenamiento_EREW
+{
+
+    public static void Main(string[] args)
+    {
+        int g;
+        int[] L = { 0, 16, 22, 35, 40, 53, 66, 70, 85, 5, 28, 33, 55, 60, 69, 72, 78 };
+        g = 16;
+        Console.WriteLine("ODD-EVEN");
+        Console.Write("Inicial:");
+        Console.Write("\n");
+        Console.Write("[");
+        for (int i = 1; i <= g; i++)
+        {
+            Console.Write(L[i] + ",");
+        }
+        Console.Write("]");
+
+
+        mergeSort(L, 1, g);
+        Console.Write("\n");
+        Console.WriteLine("Vector final:");
+        Console.Write("[");
+        for (int i = 1; i <= g; i++)
+        {
+            Console.Write(L[i] + ",");
+        }
+        Console.Write("]\n\n");
+        Console.ReadKey();
+    }
+
+    public static void mergeSort(int[] L, int ini, int fin)
+    {
+        int centro = (fin + ini) / 2;
+        if (ini < fin)
+        {
+            Parallel.Invoke(() => {
+                mergeSort(L, ini, centro);
+                mergeSort(L, centro + 1, fin);
+                oddEvenMerge(L, ini, fin);
+            });
+        }
+    }
+
+    public static void interchange(int[] L, int a, int b)
+    {
+        int aux;
+        aux = L[a];
+        L[a] = L[b];
+        L[b] = aux;
+    }
+    public static void oddEvenSplit(int[] L, int[] odd, int[] even, int ini, int fin)
+    {
+        int cont1 = 1, cont2 = 1;
+        Parallel.For(0, 1, f => {
+            for (int i = ini; i <= fin; i++)
+            {
+                if ((i % 2) == 0)
+                {
+                    even[cont1] = L[i];
+                    cont1++;
+                }
+                else
+                {
+                    odd[cont2] = L[i];
+                    cont2++;
+                }
+            }
+        });
+    }
+
+    public static void oddEvenMerge(int[] L, int ini, int fin)
+    {
+        int n = fin - ini + 1;
+        int[] odd = new int[16];
+        int[] even = new int[16];
+        if (n == 2)
+        {
+            if (L[ini] > L[fin])
+            {
+                interchange(L, ini, fin);
+            }
+        }
+        else
+        {
+
+            oddEvenSplit(L, odd, even, ini, fin);
+            Parallel.Invoke(() => {
+                oddEvenMerge(odd, 1, (n / 2));
+                oddEvenMerge(even, 1, (n / 2));
+            });
+            int aux2 = fin - n;
+
+            Parallel.For(0, 1, f => {
+                for (int i = 1; i <= (n / 2); i++)
+                {
+
+                    intercala(L, odd, even, i, aux2);
+                }
+            });
+
+
+            for (int i = ini; i <= ((fin / 2) - 1); i++)
+            {
+                int a, b;
+                a = 2 * i;
+                b = (2 * i) + 1;
+                if ((L[a]) > (L[b]))
+                {
+                    interchange(L, a, b);
+                }
+            }
+        }
+    }
+    public static void intercala(int[] m, int[] odd, int[] even, int i, int aux)
+    {
+        m[(2 * i) - 1 + aux] = odd[i];
+        m[(2 * i) + aux] = even[i];
+    }
+
+}
+
+
+=============================================================================================
+PROGRAMA 7
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+namespace MultiMatiz
+{
+    class Program
+    {
+        public static int n;
+        public static int[,] A, B;
+        public static int[,,] C;
+        public static void Main(string[] args)
+        {
+            Console.WriteLine("\n\tMultiplicacion de matrices (2x2)");
+
+            n = 2;
+
+            A = new int[n + 1, n + 1];
+            B = new int[n + 1, n + 1];
+            C = new int[n + 1, n + 1, n + 1];
+
+            Console.WriteLine("Ingresa la Matriz A :");
+            PideMatriz(ref A, ref n);
+            Console.WriteLine("Ingresa la Matriz B :");
+            PideMatriz(ref B, ref n);
+
+            Parallel.For(1, n + 1, i =>
+            {
+                Parallel.For(1, n + 1, j =>
+                {
+                    Parallel.For(1, n + 1, k =>
+                    {
+                        C[i, j, k] = A[i, k] * B[k, j];
+                    });
+                });
+            });
+
+            for (int l = 1; l <= Math.Log(n, 2); l++)
+            {
+                Parallel.For(1, n + 1, i =>
+                {
+                    Parallel.For(1, n + 1, j =>
+                    {
+                        Parallel.For(1, (n / 2) + 1, k =>
+                        {
+                            if (((2 * k) % (int)Math.Pow(2, l)) == 0)
+                            {
+
+                                int r = C[i, j, 2 * k] + C[i, j, (2 * k) - (int)Math.Pow(2, l - 1)];
+
+                                C[i, j, 2 * k] = C[i, j, 2 * k] + C[i, j, (2 * k) - (int)Math.Pow(2, l - 1)];
+                            }
+                        });
+                    });
+                });
+            }
+
+            resultado();
+
+            Console.ReadKey();
+        }
+
+        public static void PideMatriz(ref int[,] M, ref int n)
+        {
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= n; j++)
+                {
+                    while (true)
+                    {
+                        Console.Write("Dame el elemento " + i + "," + j + " de la matriz :");
+
+                        if (int.TryParse(Console.ReadLine(), out M[i, j]))
+                            break;
+                        else
+                            Console.WriteLine("Ingresa un valor numerico!");
+                    }
+                }
+            }
+        }
+
+        public static void resultado()
+        {
+            Console.WriteLine("Matriz resultante : \n");
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= n; j++)
+                {
+                    Console.Write(C[i, j, n] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+    }
+}
