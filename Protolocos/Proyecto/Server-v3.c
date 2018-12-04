@@ -14,6 +14,8 @@
 
 //Global variables
 char * ip;
+char *velInicial; //VAriable para separar la velocidad inicial con la hora
+int veloInicial; //VAriable para castear la velocidad inicial
 
 void getIpAddress(){ //Function for get the IP address of this machine
 	int fd;
@@ -29,6 +31,28 @@ void getIpAddress(){ //Function for get the IP address of this machine
  	ip = (inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 }
 
+void formatoHoras(int numero){
+	printf("Entro -------> %d\n", numero);
+	int horas,minutos,segundos,resto;
+	horas=numero/3600;
+	resto=numero%3600;
+	minutos=resto/60;
+	segundos=resto%60;
+	printf("%d",horas);
+	printf(" hora(s)\n");
+	printf("%d",minutos);
+	printf(" minuto(s)\n");
+	printf("%d",segundos);
+	printf(" segundo(s)");
+	system("pause");
+}
+
+char sumaTiempos(char a[50], char b[50]){
+
+	system("pause");	
+}
+
+
 int main(){
 	char * mensaje;
 	printf("\n\n\n\t=============================  WELCOME :D (Server)  =============================\n\n");
@@ -42,6 +66,7 @@ int main(){
 	socklen_t longc2; //Debemos declarar una variable que contendrá la longitud de la estructura2
 	struct sockaddr_in servidor, potroC, cliente;
 	char buffer[100]; //Declaramos una variable que contendrá los mensajes que recibamos
+	char bufferTiempo[100]; 
 	port = atoi(idPort);
 
 	conexion_servidor = socket(AF_INET, SOCK_STREAM, 0); //creamos el socket
@@ -107,9 +132,6 @@ int main(){
 			close(conexion_servidor);
 	    	return 1;
 		}else{
-			char *velInicial; //VAriable para separar la velocidad inicial con la hora
-			int veloInicial; //VAriable para castear la velocidad inicial
-
 			noConexiones = noConexiones + 1; //contador del numero de conexiones
 			//Se muestran los detalles de la conexion en pantalla
 			printf("\tI'm conected with the Potro sucessfully (%s), through the port: %d\n\n", inet_ntoa(potroC.sin_addr),htons(potroC.sin_port));
@@ -134,16 +156,21 @@ int main(){
 	}else{
 		//NFORMACION DEL POTROBUS
 		while(buffer != "chao"){
-			int conteo = 0;//VAriable para el conteo del envio de datos a cada BUSSTOP
-			int bufferTiempo; 
+			int conteo = 0;//VAriable para el conteo del envio de datos a cada BUSSTOP 
 			printf("\tPotroBus state: %s\n", buffer);
 			//ENVIAR LA INFORMACION DEL POTROBUS A CADA CLIENTE
 	    	bzero((char *)&buffer, sizeof(buffer));
 	    	recv(conexion_cliente, buffer, 100, 0);
 	    	if (buffer[0] == 'M'){ //Si el potroBus se esta moviendo, entonces enviarle cosas a las paradas
-	    		while(conteo < NoBS){
-	    			bufferTiempo = 
+	    		while(conteo < NoBS){ 
+	    			//Convertir horas en minutos
+	    			sprintf(bufferTiempo, "%g", (arrayDistancias[conteo] / veloInicial) * 60); //En buffer guarda (En String) el tempo que tardará en llegar (En horas)
+	    			// y luego transforma esas horas en minutos y o guarda en buffer.
+	    			printf("tardará el potro en llegar:  %s\n", bufferTiempo);
+	    			//formatoHoras(valueOf(bufferTiempo));
+	    			//buffer = sumaTiempos( buffer, formatoHoras(atoi(bufferTiempo)));
 	    			sendto(conexion_clienteBS[conteo], buffer, 100,0,inet_ntoa(ArraydeConexiones[conteo].sin_addr),0);
+	    			//sendto(conexion_clienteBS[conteo], buffer, 100,0,inet_ntoa(ArraydeConexiones[conteo].sin_addr),0);
 	    			conteo = conteo +1;
 	    		}
 	    	}else{ //El potro NO se esta movendo, hacer cosas para que empiece un reloj y agregar ese tempo al final
