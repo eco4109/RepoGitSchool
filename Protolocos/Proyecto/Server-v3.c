@@ -59,14 +59,23 @@ int main(){
 	printf("\tThat's it. So, I'm:         --->  %s\n",ip);
 	listen(conexion_servidor, 3); //Estamos a la escucha
 	printf("\tI'm listening in the port:  --->  %d\n\n", ntohs(servidor.sin_port));
-	longc = sizeof(potroC); //Asignamos el tamaño de la estructura a esta variable
+
+	//Ask how many BUS STOP WILL WORK
+	int NoBS;
+	printf("\tHow many Bus Stops Will there be?: ");
+  	scanf("%d", &NoBS);
+
+  	float arrayDistancias[NoBS]; //Array de las distancias de cada parada de Autobus
+  	int distancex;
+ 
+ 	longc = sizeof(potroC); //Asignamos el tamaño de la estructura a esta variable
 	longc2 = sizeof(cliente); //Asignamos el tamaño de la estructura a esta variable
 	int noConexiones = 0; //VAriable auxiliar para contar cuantas conexiones hay
-	struct sockaddr_in ArraydeConexiones[4]; //Array de conexiones cada posicion es una conexion :D con determinada estructura
+	struct sockaddr_in ArraydeConexiones[10]; //Array de conexiones cada posicion es una conexion :D con determinada estructura
 	int i = 0; //VAriable para recorrer e vector de conexiones
 	printf("\n\n\n\t=============================  CLIENT CONNECTIONS :D (Server)  =============================\n\n");
 	printf("\tFirst, I'll wait for Connection (Bus Stops) ...\n" );
-	while(noConexiones < 1){ //Empieza e ciclo para establecer las conexiones con clientes
+	while(noConexiones < NoBS){ //Empieza e ciclo para establecer las conexiones con clientes
 		//Se acepta alguna conexion y se guarda en "cliente" OJO, NO se guarda en "conexion_cliente"
 		//eso es por que a funcion "accept" regresa un 0 si NO se ha hecho la conexion bien
 		conexion_clienteBS[i] = accept(conexion_servidor, (struct sockaddr *)&cliente, &longc2); //Esperamos una conexion
@@ -78,7 +87,10 @@ int main(){
 		}else{
 			noConexiones = noConexiones + 1; //contador del numero de conexiones
 			//Se muestran los detalles de la conexion en pantalla
-			printf("\t\nI'm conected with the Client:  %s, through the port: %d   ---- (%d)\n\n", inet_ntoa(ArraydeConexiones[i].sin_addr),htons(ArraydeConexiones[i].sin_port), noConexiones);
+			printf("\n\tI'm conected with the Client:  %s, through the port: %d   ---- (%d)\n\n", inet_ntoa(ArraydeConexiones[i].sin_addr),htons(ArraydeConexiones[i].sin_port), noConexiones);
+			printf("\tWhat's the distance beetwen the Start & BusStop: %d  (In mts)?: ",noConexiones);
+			scanf("%d", &distancex);
+			arrayDistancias[i] = distancex/1000.0;
 			i = i+1;
 		}
 	}
@@ -95,11 +107,19 @@ int main(){
 			close(conexion_servidor);
 	    	return 1;
 		}else{
+			char *velInicial; //VAriable para separar la velocidad inicial con la hora
+			int veloInicial; //VAriable para castear la velocidad inicial
+
 			noConexiones = noConexiones + 1; //contador del numero de conexiones
 			//Se muestran los detalles de la conexion en pantalla
 			printf("\tI'm conected with the Potro sucessfully (%s), through the port: %d\n\n", inet_ntoa(potroC.sin_addr),htons(potroC.sin_port));
 			recv(conexion_cliente, buffer, 100, 0);
-			printf("\tPotro Start Time: %s\n", buffer);
+			//Recibe la hora de partida del potro y su velocidad promedio en una cadena, separadas por un "/"
+			strtok_r(buffer, "/", &velInicial);
+			veloInicial = atoi(velInicial);
+			printf("\tPotro Start Time: %s \n", buffer);
+			printf("\tPotro Vel Average: %d Km/h\n", veloInicial);
+
 			bzero((char *)&buffer, sizeof(buffer));
 		}
 	}
@@ -114,12 +134,21 @@ int main(){
 	}else{
 		//NFORMACION DEL POTROBUS
 		while(buffer != "chao"){
+			int conteo = 0;//VAriable para el conteo del envio de datos a cada BUSSTOP
+			int bufferTiempo; 
 			printf("\tPotroBus state: %s\n", buffer);
 			//ENVIAR LA INFORMACION DEL POTROBUS A CADA CLIENTE
 	    	bzero((char *)&buffer, sizeof(buffer));
 	    	recv(conexion_cliente, buffer, 100, 0);
-	    	sendto(conexion_clienteBS[0], buffer, 100,0,inet_ntoa(ArraydeConexiones[0].sin_addr),0);
-	    	//sendto(conexion_clienteBS[1], buffer, 100,0,inet_ntoa(ArraydeConexiones[0].sin_addr),0);
+	    	if (buffer[0] == 'M'){ //Si el potroBus se esta moviendo, entonces enviarle cosas a las paradas
+	    		while(conteo < NoBS){
+	    			bufferTiempo = 
+	    			sendto(conexion_clienteBS[conteo], buffer, 100,0,inet_ntoa(ArraydeConexiones[conteo].sin_addr),0);
+	    			conteo = conteo +1;
+	    		}
+	    	}else{ //El potro NO se esta movendo, hacer cosas para que empiece un reloj y agregar ese tempo al final
+
+	    	}
 		}
 	}
 	close(conexion_servidor);
