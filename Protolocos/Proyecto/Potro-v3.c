@@ -48,10 +48,15 @@ int main(){
   time_t t;
   struct tm *tm;
   char horaPartida[50];
+  char velInicial[50];
   t = time(NULL);
   tm=localtime(&t);
   strftime(horaPartida, 100, "%H:%M:%S",tm);
   printf("\tStart time: %s\n", horaPartida );
+  printf("\tWhat is the PotroBus vel. average? (Km/h): ");
+  scanf("%s", velInicial);
+  strcat(horaPartida,"/");
+  strcat(horaPartida,velInicial);
   send(conexion, horaPartida, 100, 0); //envio
   printf("\n\n\n\t=============================   STATUS INFORMATION     ============================\n\n");
   char * buffer2 = "Moving";
