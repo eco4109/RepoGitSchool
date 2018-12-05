@@ -1,0 +1,9 @@
+- La "pc" es el proyecto, consta de una computadora principal, "QUALCOM" ejecutando constantemente el ciclo de fetch
+- Al mismo tiempo está el reloj generando interrupciones al ciclo de fetch
+- Así como procesos de red (NIC) y de entrada y salida E_S, corren pero generaran interrupciones, commo?
+- La "pc" lee de DSK1 y lo carga a la memoria RAM
+
+- Para escribir en DSK1 (osea escribir en disco un programa):
+	- En "computadora.xsl" se encuentra en "hoja 1" las funciones en excel para generar el codigo del programa, usar las que dicen buffer
+	- Usar esa hoja de excel para generar el codigo del programa y pegarlo en el codigo de "writeDisc.java", compilarlo y ejecutarlo
+	- "writeDisk. java escribira en DISK1" el programa deseado, despues ejecutar "pc.java" y esta leera DISK1 para ejecutar ese programa :) 
