@@ -1,0 +1,99 @@
+55 7100 2180
+987 158 2676
+
+
+
+Push pila de interrupciones:
+
+Push(x)
+  no meter si esta en interrupcion y si se pide meter 1
+  Si (n=Max)
+    Cola llena
+  otro
+    cola[e]=x
+    Si e=Max-1
+      e=0
+    otro
+      e++
+    finsi
+  finsi
+finf
+
+
+Pop(x)
+  Si(n=0)
+    Cola Vacia
+  otro
+    x=cola[s]
+    si(s=Max-1)
+      s=0
+    otro
+      s++
+    finsi
+  finsi
+finf
+
+Proceso 0: Reloj
+Proceso 1: Red
+Proceso 2: E/S
+Proceso 3: Controlador de Interrupciones
+
+pc()
+ mientras (!PSW(14))
+    trae
+    traduce
+    ejecuta
+    si (CPU_Int)
+	CPU_Int = F
+	En_Int = V
+	y = RAM(0)+RAM(1)
+	RAM(y)=BP
+	RAM(y+4) = IP
+	BP = RAM(2)+RAM(3)
+	IP=0
+	PSW(15) = V
+     fins
+   finmientras
+finf	
+
+red()
+  push(1)
+fin f
+
+es()
+  push(2)
+finf
+
+reloj()
+  trans =0
+  reloj =t_actual
+  mientras(true)
+   transc = t_actual-reloj
+   si(transc>quantum)
+      push(1)
+      reloj=t_actual
+      transc=0
+   fins
+  finm
+finf
+
+controladorInter()
+  mientras(true)
+    mientras(dormido(3));
+    mientras(n==0);
+    CPU_int = true
+    dormir(3)
+  fin_mientras
+fin_funcion
+
+
+VECTOR DE INTERRUPCIONES
+
+1	8500	Interrupcion de reloj
+2	2300	Interrupcion de red
+3	1000	Interrupcion de e/s
+
+
+
+
+

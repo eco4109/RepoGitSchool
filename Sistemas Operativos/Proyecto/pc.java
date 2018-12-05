@@ -4,16 +4,13 @@
 	20-Agosto-2018
 	Programa para simular el cpu de una computadora virtual
 */
+
 import java.io.*;
 import java.nio.*;
 import java.util.*;
 
 
 public class pc{
-	static final int MUE_REG_REG = 0;
-	static final int MUE_REG_BUS = 64;
-	static final int MUE_BUS_REG = 1;
-	static final int MUE_BUS_BUS = 65;
 	static final int RA = 0;
 	static final int RB = 1;
 	static final int RC = 2;
@@ -28,25 +25,31 @@ public class pc{
 	static final int DS = 11;
 	static final int IPR = 12;
 	static final int OI = 13;
-	static final int NOP = 5;
-	static final int COMP = 6;
+
 	static final int ALU_B1 = 0;
 	static final int ALU_B2 = 1;
 	static final int ALU_B3 = 2;
-
+	static final int ALU_SUM = 66;
+	static final int ALU_RES = 67;
+	static final int ALU_MUL = 68;
+	static final int ALU_DIV = 69;
 	static final int MMU_B1 = 3;
 	static final int MMU_B2 = 4;
 	static final int MMU_B3 = 5;
 	static final int MEM_B1 = 6;
 	static final int MEM_B2 = 7;
-	static final int ALU_SUM = 66;
-	static final int ALU_RES = 67;
-	static final int ALU_MUL = 68;
-	static final int ALU_DIV = 69;
+
+	static final int MUE_REG_REG = 0;
+	static final int MUE_BUS_REG = 1;
+	static final int MUE_REG_BUS = 64;
+	static final int MUE_BUS_BUS = 65;
 	static final int MUE_DATO_REG = 32;
 	static final int MUE_DATO_BUS = 96;
-	static final int SBAND = 49;
 	static final int DUMP=33;
+	static final int NOP=5;
+	static final int COMP=6;
+	static final int SBAND = 34;
+	
 	static final int MMU_OPER=70;
     static final int MMU_BY_PASS=71;
     static final int MEM_ESC_B=2;
@@ -57,9 +60,17 @@ public class pc{
     static final int MEM_LECT_DP=74;
 	static final int BANDON=192;
 	static final int BANDOFF=193;
+	static final int GETINT=128;
 
 
 	public static boolean CPUInt = false;
+	public static boolean EnInterrupcion;
+	public static int n = 0; //Variable para el numero de cosas en la cola de interrupciones
+	public static int max = 10; //Máximo 10 interrupciones en el vector de interrupciones
+	public static int[] Int_cola = new int[max]; //Vector de interrupciones, tamaño 10 
+	public static int e;
+	public static int s;
+	public static int x;
 
 
 	//Dispositivos y arranque del BIOS
@@ -104,7 +115,6 @@ public class pc{
 	static int dato;
 
 	//public static int dato[];
-
 	static int cod_inst = 0;
 	static int orig; 
 	static int dest;
@@ -194,6 +204,14 @@ public class pc{
 		buff_dato[2]=RAM[x];
 		x++;
 		buff_dato[3]=RAM[x];
+
+		/*System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
+		System.out.printf("Buffer de traduccion: %02X", buff_trad[1]);
+		System.out.printf("Buffer de DATO: %02X", buff_dato[0]);
+		System.out.printf("Buffer de DATO: %02X", buff_dato[1]);
+		System.out.printf("Buffer de DATO: %02X", buff_dato[2]);
+		System.out.printf("Buffer de DATO: %02X", buff_dato[3]);
+		*/
 	}
 
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
@@ -233,18 +251,16 @@ public class pc{
 	}
 
 	public static void traduce(){
-	
 		int k = verificaValor(forceint(buff_trad[0]),1);
 		int s = verificaValor(forceint(buff_trad[0]),2);
 		int L = verificaValor(forceint(buff_trad[0]),3);
 		
-		 
-	
 		if(k==1 && (!PSW[15])){
 			System.out.println("\7 Violacion de Acceso al Modo Kernel");
 			System.exit(4);
 		}
 		cod_inst=buff_trad[0];
+
 		int largo = 2+4*L;
 		int aux;
 		if(largo==6){
@@ -263,11 +279,17 @@ public class pc{
 		}
 		float j = IEEE_a_flotante(R[IP])+largo;
 		R[IP] = flotante_a_IEEE(j);
+		System.out.println("IP: --- --- ---    "+forceint(IEEE_a_flotante(R[IP])));
 		float f = IEEE_a_flotante(R[OI]);
 		float w = s*(f+s*largo);
 		R[OI]=flotante_a_IEEE(w);
 		orig = (buff_trad[1]&0xF0)>>>4;
 		dest = (buff_trad[1]&0xF);
+
+		/*System.out.println("Codigo de la Instruccion = "+cod_inst);
+		System.out.println("Origen = "+orig);
+		System.out.println("Destino = "+dest);
+		*/
 }
 	public static float IEEE_a_flotante( int f){
 		float yy = Float.intBitsToFloat((f));
@@ -424,7 +446,41 @@ public class pc{
 		int valorEntero = (int) f;
 		return valorEntero;
 	}
+	
+	public static void push(int x){
+		if(((EnInterrupcion)&&(x==1))){ //Si estoy en interrupcion y entra una d ereloj, NO HACER NADA x = 0 <- interrupcion de reloj
+			System.out.print(" ");
+		}else{
+			if (n==max){
+				System.out.println("La cola está llena");
+				System.exit(4);
+			}else{
+				n = n+1;
+				Int_cola[e] = x;
+				if(e==(max-1)){
+					e = 0;
+				}else{
+					e = e+1;
+				}
+			}
+		}
+	}
 
+	public static int pop(){
+		if(n==0){
+			System.out.println("cola vacia");
+		}else{
+			n = n-1;
+			x = Int_cola[s];
+			if(s==(max-1)){
+				s=0;
+			}else{
+				s = s+1;
+			}
+		}
+		return x;
+	}
+	
 	public static void dump(int mem){
 		String var1, var2;
 		String[] NomReg=new String[14];
@@ -495,10 +551,8 @@ public class pc{
 			}
 		}
 	}
-// dump instrution, instruction in user mode 
-	public static void main(String[] argumento) {
-		
 
+	public static void main(String[] argumento) {
 		if(argumento.length!=0){
 			if(argumento[0].equals("BIOS"))
 				BIOS.IniciaBIOS();
@@ -508,272 +562,165 @@ public class pc{
 			if(argumento.length==3 && argumento[0].equals("CreaUSB")){
 				CrearUSB.creaUSB(argumento[1],argumento[2]);
 			}
-			if(argumento[0].equals("escribe")){
-				escribeDisco();
-				System.out.println("Escritura correctaa");
-				pausa();
-			}
 			System.exit(0);
 		}
+
+		//Procesos de la computadora virtual
 		Computadora COMPAQ = new Computadora();
-		Interrupcion interrumpe = new Interrupcion();
-		
-		
-		
+		reloj CLOCK = new reloj();
+		nic NIC  = new nic(); 
+		in_out INOUT = new in_out(); 
 		BIOS.VerifDispo();
 		BIOS.StartUP();
-		for (int i=0; i<=45 ; i++) {
-			 System.out.printf("RAM[%d] = %02X\t",i,RAM[i]);
+		int NoCasiilasPintar = 50;
+		System.out.printf("\nSe han cargado de disco a la RAM exitosamente, mostrando %d direcciones de memoria: \n\n",NoCasiilasPintar);
+		for (int i=0; i<=NoCasiilasPintar ; i++) {
+			//Pinta la RAM al empezar 
+			 System.out.printf("RAM[%d] = %02X    ",i,RAM[i]);
+			 if(((i%8) == 0)&&(i > 0)){
+			 	System.out.println("\n");
+			 }
 		}
+		System.out.println("\n");
 		PSW[15] = true;
 		for (int i = 0; i<=13 ; i++) {
 		 	R[i] = 0;
 		 } 
-		//Inicializar vector de interrupciones
-		cola.inicializarCola();
+		//Pausa antes de empezar la computadora y el reloj
+		System.out.println("Press Any Key To Continue...");
+		new java.util.Scanner(System.in).nextLine();
 		COMPAQ.start();
-		interrumpe.start();
+		CLOCK.start();
+		NIC.start();
+		INOUT.start();
 	}
-
-	public static void escribeDisco(){
-		RAM[0]=(byte)0x00;
-		RAM[1]=(byte)0x01;
-		RAM[2]=(byte)0x00;
-		RAM[3]=(byte)0x01;
-		RAM[4]=(byte)0x00;
-		RAM[5]=(byte)0x01;
-		RAM[6]=(byte)0x00;
-		RAM[7]=(byte)0x01;
-		RAM[8]=(byte)0x00;
-		RAM[9]=(byte)0x01;
-		RAM[10]=(byte)0x00;
-		RAM[11]=(byte)0x01;
-		RAM[12]=(byte)0x00;
-		RAM[13]=(byte)0x01;
-		RAM[14]=(byte)0x00;
-		RAM[15]=(byte)0x01;
-		RAM[16]=(byte)0x00;
-		RAM[17]=(byte)0x01;
-		RAM[18]=(byte)0x00;
-		RAM[19]=(byte)0x01;
-		RAM[20]=(byte)0x00;
-		RAM[21]=(byte)0x01;
-		RAM[22]=(byte)0x00;
-		RAM[23]=(byte)0x01;
-		RAM[24]=(byte)0x00;
-		RAM[25]=(byte)0x01;
-		RAM[26]=(byte)0x00;
-		RAM[27]=(byte)0x01;
-		RAM[28]=(byte)0x00;
-		RAM[29]=(byte)0x01;
-		RAM[30]=(byte)0x00;
-		RAM[31]=(byte)0x01;
-		RAM[32]=(byte)0x00;
-		RAM[33]=(byte)0x01;
-		RAM[34]=(byte)0x00;
-		RAM[35]=(byte)0x01;
-		RAM[36]=(byte)0x00;
-		RAM[37]=(byte)0x01;
-		RAM[38]=(byte)0x00;
-		RAM[39]=(byte)0x01;
-		RAM[40]=(byte)0x00;
-		RAM[41]=(byte)0x01;
-		RAM[42]=(byte)0x00;
-		RAM[43]=(byte)0x01;
-		RAM[44]=(byte)0x00;
-		RAM[45]=(byte)0x01;
-		RAM[46]=(byte)0x00;
-		RAM[47]=(byte)0x01;
-		RAM[48]=(byte)0x00;
-		RAM[49]=(byte)0x01;
-		RAM[50]=(byte)0x00;
-		RAM[51]=(byte)0x01;
-		RAM[52]=(byte)0x00;
-		RAM[53]=(byte)0x01;
-		RAM[54]=(byte)0x00;
-		RAM[55]=(byte)0x01;
-		RAM[56]=(byte)0x00;
-		RAM[57]=(byte)0x01;
-		RAM[58]=(byte)0x00;
-		RAM[59]=(byte)0x01;
-		RAM[60]=(byte)0x00;
-		RAM[61]=(byte)0x01;
-		RAM[62]=(byte)0x00;
-		RAM[63]=(byte)0x01;
-		RAM[64]=(byte)0x00;
-		RAM[65]=(byte)0x01;
-		RAM[66]=(byte)0x00;
-		RAM[67]=(byte)0x01;
-		RAM[68]=(byte)0x00;
-		RAM[69]=(byte)0x01;
-		RAM[70]=(byte)0x20;
-		RAM[71]=(byte)0x03;
-		RAM[72]=(byte)0x00;
-		RAM[73]=(byte)0x00;
-		RAM[74]=(byte)0x00;
-		RAM[75]=(byte)0x00;
-
-
-		escribe("DSK1.dsk",13);
-	}
-	public static void lee(String archivo, int pos){
-		try{
-			RandomAccessFile binfile = new RandomAccessFile(archivo, "rw");
-			binfile.seek(pos);
-			int bytes_leidos = binfile.read(buffer);
-			binfile.close();
-		}catch(IOException e){
-			System.out.print("No se pudo abrir el archivo");
-
-		}
-	}
-	public static void escribe(String Archivo, int pos){
-		try{
-			RandomAccessFile binfile = new RandomAccessFile(Archivo, "rw");
-			binfile.seek(pos);
-			binfile.write(RAM);
-			binfile.close();
-
-		} catch(IOException ex){
-			ex.printStackTrace();
-			System.out.println("\n\7 Fatal error");
-			System.exit(0);
-			}
-		}
 }
 
 class Computadora extends Thread{
 	public void run(){
 		while(!pc.PSW[14]){
+			int y;
+			int x;
+			int aux;
+			int ipd;
+			int bpd;
+			int r0, r1, r2, r3;
+
+			byte bait, bait2;
+			int entero = 0; 
+
 			pc.capta();
 		 	pc.traduce();
 		 	pc.ejecuta();
-		 	System.out.println("Un Ciclo de Fetch Terminado ... ");
-		 	if(pc.CPUInt){
-		 		//pc.dump(0);
-		 		System.out.println("\7Fetch Interrumpido ... ");
-		 	}	
-			pc.CPUInt = false;
-		 	
-		}
-	}
-
-}
-
-class Interrupcion extends Thread{
-	public void run(){ //Genera la interrupcion de justicia, alterna entre procesos
-		long quantum = 500; //Interrupción de justicia
-		
-			long horaSistema, horaInicial, diferencia;
-			horaInicial = System.currentTimeMillis();
-			while(true){
-				horaSistema = System.currentTimeMillis();
-				diferencia = horaSistema - horaInicial;	
-				//System.out.println(diferencia);
-				if((diferencia >= quantum - 10)&&(diferencia <= quantum +10)){
-					//pc.CPUInt = true;
-					System.out.println("INTERRUPCION !\7");
-					cola.insertarCola(1);
-					horaInicial = horaSistema;					
-					//System.out.println("Press Any Key To Continue...");
-					//new java.util.Scanner(System.in).nextLine();
-			}
-		}
 	
+		 	System.out.println("Un Ciclo de Fetch Terminado ...");
 
+		 	
+		 	
+		 	if(pc.CPUInt){
+		 		pc.dump(0);
+		 		System.out.println("--- Ciclo de Fetch Interrumpido --- \7");
+				pc.CPUInt = false;
+				pc.EnInterrupcion = true;
+				//Respaldar el BP e IP
+				//System.out.printf("\n\n(hexadecimal) RAM[0: %02X \n",pc.RAM[0]);
+				//System.out.printf("\n\n(hexadecimal) RAM[1: %02X \n",pc.RAM[1]);
 
+				r0 = pc.RAM[0]&0xFF;
+				r1 = pc.RAM[1]&0xFF;
 
+				//System.out.println("\n\n(decimal) RAM[0:  "+r0+" \n");
+				//System.out.println("\n\n(decimal) RAM[1:  "+r1+" \n\n");
 
+				System.out.println("El IP: "+ pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
+				System.out.println("El BP: "+ pc.forceint(pc.IEEE_a_flotante(pc.R[pc.BP])));
 
+				y = (pc.RAM[0]&0xFF) + (pc.RAM[1]&0xFF);
 
-		/*Random generadorAleatorios = new Random();
-		while(true){
-		//System.out.println(generadorAleatorios.nextInt(100));
-			if (generadorAleatorios.nextInt(10000000)==5469){
-				pc.CPUInt = true;
-			}
-		}*/
+				//System.out.println("Suma de la RAM [0] y RAM[1] : "+ y);
+
+				pc.RAM[y] = (byte) (pc.forceint(pc.IEEE_a_flotante(pc.R[pc.BP])));
+				pc.RAM[y+4] = (byte) (pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
+
+				//System.out.printf("Entonces, RAM en la posicion %d  =  %02X",y, pc.RAM[y]);
+				//System.out.printf("Entonces, RAM en la posicion %d =  %02X",y+4,pc.RAM[y+4]);
+
+				//System.out.printf("\n\n(hexadecimal) RAM[2: %02X \n",pc.RAM[2]);
+				//System.out.printf("\n\n(hexadecimal) RAM[3: %02X \n",pc.RAM[3]);
+
+				r2 = pc.RAM[2]&0xFF;
+				r3 = pc.RAM[3]&0xFF;
+
+				//System.out.println("\n\n(decimal) RAM[2:  "+r2+" \n");
+				//System.out.println("\n\n(decimal) RAM[3:  "+r3+" \n\n");
+
+				pc.R[pc.BP] = pc.flotante_a_IEEE((float) (r2+r3));
+
+				System.out.println("BP QUEDA COMO (en IEEE): "+pc.R[pc.BP]);
+				System.out.println("BP QUEDA COMO (en float): "+pc.IEEE_a_flotante(pc.R[pc.BP]));
+
+				pc.R[pc.IP] = pc.flotante_a_IEEE(0);
+
+				System.out.println("IP QUEDA COMO (en IEEE): "+pc.R[pc.IP]);
+				System.out.println("IP QUEDA COMO (en float): "+pc.IEEE_a_flotante(pc.R[pc.IP]));
+	
+				//pc.RAM[y+4] = pc.BP;
+				
+				//forceint(IEEE_a_flotante(R[BP]) + IEEE_a_flotante(R[IP]))
+
+				//pc.RAM[pc.BP] = pc.RAM[3] + pc.RAM[4]
+				
+				//REESPALDAR PROCEDIMIENTO ACTUAL!!!
+		 		//pc.PSW[15] = true; //Cambiamos a modo kernel
+		 	}	
+		}
 	}
 
 }
 
+/*
+12/11/2018
+
+red()
+	push(1)
+	
+e_s()
+	push(2)
 
 
-class cola{
-	static int max = 10; //Tamaño máximo de la cola
-	static int[] cola = new int[max]; //Definición de la cola circular de tamaño "n"
-	static int inicioC, finC; //Indicadores del inicio y final de la cola
-	static int noElementos; //Contador de numero de elementos en la cola
+VECTOR DE INTERRUPCIONES
+1	8500	Interrupcion de reloj
+2	2300	Interrupción de red
+3	1000	Interrupción de E/S
+*/
 
-	public static void inicializarCola(){ //Fución para iniciar la cola y los apuntadores
-		inicioC = -1;
-		finC = -1;
-		System.out.println("\n\nCola inicializada resiona para continuar ... ...\n");
-		new java.util.Scanner(System.in).nextLine();
-	}
-
-	public static void insertarCola(int dato){ //Inserta en la cola un entero
-		if((finC == max-1 && inicioC == 0) || (finC+1==inicioC)){
-			System.out.println("\nCOLA LLENA:\n");
-			mostrarCola();
-			System.out.println("\nTERMINA PROGRAMA");
-			System.exit(0);
-		}
-		noElementos ++;
-		if(finC==max-1 && inicioC!=0){
-			finC = 0;
-		}else{
-			finC++;
-		}
-
-		cola[finC] = dato;
-		System.out.println("Dato insertado correctamente: "+dato+" Datos en la cola: "+noElementos);
-
-		
-		if(inicioC==-1){
-			inicioC = 0;
+class reloj extends Thread{ //Proceso del reloj
+	public void run(){ 
+		long quantum = 1000; //Interrupción de justicia
+		long horaSistema, horaInicial, diferencia;
+		horaInicial = System.currentTimeMillis();
+		while(true){
+			horaSistema = System.currentTimeMillis();
+			diferencia = horaSistema - horaInicial;	
+			if((diferencia >= quantum - 10)&&(diferencia <= quantum +10)){
+				System.out.println("--- INTERRUPCION DE RELOJ ---");
+				pc.CPUInt = true;
+				pc.push(1);
+				horaInicial = horaSistema;					
+			}
 		}
 	}
 
-	public static void removerCola(){ //Remover un elemento de a cola
-		if(inicioC==-1) {
-			System.out.println("\nCOLA VACIA\n");
-			return;
-		}
-		System.out.println("Dato eliminado correctamente: "+cola[inicioC]);
-		noElementos = noElementos -1;
-		if(inicioC==finC){
-			inicioC=-1;
-			finC=-1;
-			return;
-		}
-		if(inicioC==max){
-			inicioC=0; 
-		}else {
-			inicioC++;
-		}
+}
+
+class nic extends Thread{ //Proceso de la NIC
+	public void run(){ 
+		System.out.println("Se inicio la NIC");
 	}
+}
 
-
-	public static void mostrarCola(){ //Muestra la cola
-		if(inicioC == -1 ){
-			System.out.println("\nCOLA VACIA\n");
-		}else{
-			int i=inicioC;
-			System.out.print("\n\nVolcado de la Cola: [");
-			do {
-				System.out.print(" "+cola[i]+" ");
-				i++;
-				if(i==max && inicioC>finC){
-					i=0; // Reiniciar en cero (dar la vuelta)	
-				} 
-			}while(i!=finC+1);
-			System.out.println("]");
-			//System.out.println("Inicio: "+inicioC);
-			//System.out.println("Fin: "+fin);
-			//System.out.println("Max: "+max);
-			System.out.println("\nCola volcada, presiona para continuar ... ...\n");
-			new java.util.Scanner(System.in).nextLine();
-		}
+class in_out extends Thread{
+	public void run(){
+		System.out.println("Se inicio Entradas y Salidas");
 	}
 }
