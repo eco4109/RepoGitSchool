@@ -209,12 +209,13 @@ public class pc{
 		x++;
 		buff_dato[3]=RAM[x];
 
-		System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
+		/*System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
 		System.out.printf("Buffer de traduccion: %02X", buff_trad[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[0]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[2]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[3]);
+		*/
 	}
 
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
@@ -490,6 +491,7 @@ public class pc{
 	
 	public static void dump(int mem){
 		String var1, var2;
+		int temp1;
 		String[] NomReg=new String[14];
 		String[] NomBus=new String[8];
 		NomReg[0]="RA";
@@ -529,7 +531,9 @@ public class pc{
 		System.out.print("\n");
 		if(!NoSirve.equals("x")){
 			NoSirve="";
+			//System.out.println("\n\nA la funcion DUMP le entro:  "+mem+"  ==============================================="); 
 			temp1=forceint(IEEE_a_flotante(mem)); 
+			//System.out.println("\n\nSe va a dumpear desde: "+temp1+"  ==============================================="); 
 			temp1=temp1-(temp1%16);
 			temp2=0;
 			temp3=0;
@@ -612,7 +616,6 @@ public class pc{
 class Computadora extends Thread{
 	public void run(){
 		while(!pc.PSW[14]){
-			int y;
 			int x;
 			int aux;
 			int ipd;
@@ -626,10 +629,69 @@ class Computadora extends Thread{
 		 	pc.traduce();
 		 	pc.ejecuta();
 			System.out.println("Al terminar este Ciclo, el IP quedo como:     "+pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
+			System.out.println("Al terminar este Ciclo, el BP quedo como:     "+pc.forceint(pc.IEEE_a_flotante(pc.R[pc.BP])));
+
 		 	System.out.println("Un Ciclo de Fetch Terminado ...");
 		 	
 		 	if(pc.CPUInt){
-		 		System.out.println("--- Ciclo de Fetch Interrumpido --- \7");
+		 		System.out.println("--- Ciclo de FETCH interrumpido ---\n");
+				pc.EnInterrupcion = true;
+				int c;
+				int y = 0;
+				//Respaldar el IP y el BP;
+
+				//Leer los primeros 5 bytes de la RAM y hacerlo entero
+				y+=((pc.RAM[0] & 0xFF)<<24);
+				y+=((pc.RAM[1] & 0xFF)<<16);
+				y+=((pc.RAM[2] & 0xFF)<<8);
+				y+=((pc.RAM[3] & 0xFF)<<0);
+				y=(int)pc.IEEE_a_flotante(y);
+
+				System.out.println("En los primeros 4 bytes de la RAM hay: "+y);
+				//Ir a esa posicion de la RAM y allí guardar a BP (en 4 bytes)
+				pc.RAM[y] = (byte)(pc.R[pc.BP]>>>24);
+				y = y+1;
+				pc.RAM[y] = (byte)(pc.R[pc.BP]>>>16);
+				y = y+1;
+				pc.RAM[y] = (byte)(pc.R[pc.BP]>>>8);
+				y = y+1;
+				pc.RAM[y] = (byte)(pc.R[pc.BP]>>>0);
+				y = y+1;
+				//En los siguientes 4 bytes de la RAM, meter a IP
+				pc.RAM[y] = (byte)(pc.R[pc.IP]>>>24);
+				y = y+1;
+				pc.RAM[y] = (byte)(pc.R[pc.IP]>>>16);
+				y = y+1;
+				pc.RAM[y] = (byte)(pc.R[pc.IP]>>>8);
+				y = y+1;
+				pc.RAM[y] = (byte)(pc.R[pc.IP]>>>0);
+
+				pc.dump(1120403456); //dumpea desde la 100
+				System.exit(4);
+
+
+				int mr = 0;
+				mr+=((pc.RAM[4] & 0xFF)<<24);
+				mr+=((pc.RAM[5] & 0xFF)<<16);
+				mr+=((pc.RAM[6] & 0xFF)<<8);
+				mr+=((pc.RAM[7] & 0xFF)<<0);
+
+				//Actualizar el BP
+				pc.R[pc.BP] = mr;
+				//Iniciar el IP desde cero (no quiere decir iniciar desde la posicion 0 de la RAM) recordqar eso del desplazamiento
+				pc.R[pc.IP] = 0;
+				//Sacar la interrupcion de la cola
+				pc.pop();
+
+				//Apagar banderas de interrupciones y dmas
+				pc.CPUInt = false;
+				pc.EnInterrupcion = false;
+				pc.PSW[15] = true;
+
+
+
+		 		//pc.dump(1120403456); //dumpea desde la 100
+		 		/*System.out.println("--- Ciclo de Fetch Interrumpido --- \7");
 				pc.CPUInt = false;
 				pc.EnInterrupcion = true;
 				//Respaldar el BP e IP
@@ -681,7 +743,7 @@ class Computadora extends Thread{
 				//pc.RAM[pc.BP] = pc.RAM[3] + pc.RAM[4]
 				
 				//REESPALDAR PROCEDIMIENTO ACTUAL!!!
-		 		//pc.PSW[15] = true; //Cambiamos a modo kernel
+		 		//pc.PSW[15] = true; //Cambiamos a modo kernel*/
 		 	}	
 		}
 	}
@@ -718,14 +780,14 @@ class c_interrup extends Thread{
 
 class reloj extends Thread{ //Proceso del reloj
 	public void run(){ 
-		long quantum = 5000; //Interrupción de justicia
+		long quantum = 2000; //Interrupción de justicia
 		long horaSistema, horaInicial, diferencia;
 		horaInicial = System.currentTimeMillis();
 		while(true){
 			horaSistema = System.currentTimeMillis();
 			diferencia = horaSistema - horaInicial;	
 			if((diferencia >= quantum - 20)&&(diferencia <= quantum +20)){
-				System.out.println("--- INTERRUPCION DE RELOJ ---");
+				System.out.println("--- INTERRUPCION DE RELOJ ----------------------------------------------------------------------------");
 				pc.CPUInt = true;
 				pc.push(1);
 				horaInicial = horaSistema;					
