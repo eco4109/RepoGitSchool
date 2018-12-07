@@ -193,8 +193,11 @@ public class pc{
 	}
 
 	public static void capta(){
+		//System.out.println("1");
 		int x=forceint(IEEE_a_flotante(R[BP]) + IEEE_a_flotante(R[IP]));
+		//System.out.println("2");
 		buff_trad[0]=RAM[x];
+		//System.out.println("2");
 		x++;
 		buff_trad[1]=RAM[x];
 		x++;
@@ -206,13 +209,12 @@ public class pc{
 		x++;
 		buff_dato[3]=RAM[x];
 
-		/*System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
+		System.out.printf("Buffer de traduccion: %02X", buff_trad[0]);
 		System.out.printf("Buffer de traduccion: %02X", buff_trad[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[0]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[2]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[3]);
-		*/
 	}
 
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
@@ -348,11 +350,12 @@ public class pc{
 				B[ALU_B3]=flotante_a_IEEE(res_alu);
 				break;
 			case MUE_DATO_REG:
-				if (dest == IP) {
+				/*if (dest == IP) {
 					R[dest]=flotante_a_IEEE(dato);
 				}else{
 					R[dest]=dato;
-				}
+				}*/
+				R[dest]=dato;
 				break;
 			case DUMP:
 				dump(dato);
@@ -715,7 +718,7 @@ class c_interrup extends Thread{
 
 class reloj extends Thread{ //Proceso del reloj
 	public void run(){ 
-		long quantum = 1000; //Interrupción de justicia
+		long quantum = 5000; //Interrupción de justicia
 		long horaSistema, horaInicial, diferencia;
 		horaInicial = System.currentTimeMillis();
 		while(true){
