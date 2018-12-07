@@ -65,6 +65,7 @@ public class pc{
 
 	public static boolean CPUInt = false;
 	public static boolean EnInterrupcion;
+	public static boolean dormidoV[] = new boolean[10]; //Vector de dormido (los procesos)
 	public static int n = 0; //Variable para el numero de cosas en la cola de interrupciones
 	public static int max = 10; //Máximo 10 interrupciones en el vector de interrupciones
 	public static int[] Int_cola = new int[max]; //Vector de interrupciones, tamaño 10 
@@ -279,7 +280,6 @@ public class pc{
 		}
 		float j = IEEE_a_flotante(R[IP])+largo;
 		R[IP] = flotante_a_IEEE(j);
-		System.out.println("IP: --- --- ---    "+forceint(IEEE_a_flotante(R[IP])));
 		float f = IEEE_a_flotante(R[OI]);
 		float w = s*(f+s*largo);
 		R[OI]=flotante_a_IEEE(w);
@@ -348,7 +348,11 @@ public class pc{
 				B[ALU_B3]=flotante_a_IEEE(res_alu);
 				break;
 			case MUE_DATO_REG:
-				R[dest]=dato;
+				if (dest == IP) {
+					R[dest]=flotante_a_IEEE(dato);
+				}else{
+					R[dest]=dato;
+				}
 				break;
 			case DUMP:
 				dump(dato);
@@ -565,11 +569,11 @@ public class pc{
 			System.exit(0);
 		}
 
-		//Procesos de la computadora virtual
+		//Procesos de la computadora virtual (Controlador de interrupciones, reloj y CPU)
 		Computadora COMPAQ = new Computadora();
 		reloj CLOCK = new reloj();
-		nic NIC  = new nic(); 
-		in_out INOUT = new in_out(); 
+		c_interrup C_Interrup = new c_interrup();
+
 		BIOS.VerifDispo();
 		BIOS.StartUP();
 		int NoCasiilasPintar = 50;
@@ -587,12 +591,18 @@ public class pc{
 		 	R[i] = 0;
 		 } 
 		//Pausa antes de empezar la computadora y el reloj
+		for(int l =0; l< dormidoV.length; l++) { //Inicializar el vector de dormido
+			dormidoV[l] = false; 
+		}
+		System.out.println("\nVector dormidoV inicializado\n ");
 		System.out.println("Press Any Key To Continue...");
 		new java.util.Scanner(System.in).nextLine();
+
+
+
 		COMPAQ.start();
+		C_Interrup.start();
 		CLOCK.start();
-		NIC.start();
-		INOUT.start();
 	}
 }
 
@@ -612,13 +622,10 @@ class Computadora extends Thread{
 			pc.capta();
 		 	pc.traduce();
 		 	pc.ejecuta();
-	
+			System.out.println("Al terminar este Ciclo, el IP quedo como:     "+pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
 		 	System.out.println("Un Ciclo de Fetch Terminado ...");
-
-		 	
 		 	
 		 	if(pc.CPUInt){
-		 		pc.dump(0);
 		 		System.out.println("--- Ciclo de Fetch Interrumpido --- \7");
 				pc.CPUInt = false;
 				pc.EnInterrupcion = true;
@@ -692,7 +699,19 @@ VECTOR DE INTERRUPCIONES
 1	8500	Interrupcion de reloj
 2	2300	Interrupción de red
 3	1000	Interrupción de E/S
+4           Controlasor de Interrupciones
 */
+class c_interrup extends Thread{
+	public void run(){
+		System.out.println("Se inicio el controlador de Interrupciones");
+		while(true){
+			while(pc.dormidoV[4]);
+			while(pc.n == 0); //Mientras la cola de interrupciones estpa vacia, se cicla allí
+			pc.CPUInt = true;
+			pc.dormidoV[4] = true;
+		}
+	}
+}
 
 class reloj extends Thread{ //Proceso del reloj
 	public void run(){ 
@@ -702,7 +721,7 @@ class reloj extends Thread{ //Proceso del reloj
 		while(true){
 			horaSistema = System.currentTimeMillis();
 			diferencia = horaSistema - horaInicial;	
-			if((diferencia >= quantum - 10)&&(diferencia <= quantum +10)){
+			if((diferencia >= quantum - 20)&&(diferencia <= quantum +20)){
 				System.out.println("--- INTERRUPCION DE RELOJ ---");
 				pc.CPUInt = true;
 				pc.push(1);
@@ -711,16 +730,4 @@ class reloj extends Thread{ //Proceso del reloj
 		}
 	}
 
-}
-
-class nic extends Thread{ //Proceso de la NIC
-	public void run(){ 
-		System.out.println("Se inicio la NIC");
-	}
-}
-
-class in_out extends Thread{
-	public void run(){
-		System.out.println("Se inicio Entradas y Salidas");
-	}
 }

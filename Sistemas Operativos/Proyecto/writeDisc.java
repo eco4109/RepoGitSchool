@@ -16,6 +16,7 @@ public class writeDisc{
 	}
 
 	public static void setBuffer(){
+
 		buffer[0]=(byte)0x20;
 buffer[1]=(byte)0x03;
 buffer[2]=(byte)0x41;
@@ -242,9 +243,7 @@ buffer[222]=(byte)0x45;
 buffer[223]=(byte)0x00;
 buffer[224]=(byte)0x70;
 buffer[225]=(byte)0x06;
-
-
-	}
+}
 
 	public static void write(String Archivo, int pos){
 		try{
