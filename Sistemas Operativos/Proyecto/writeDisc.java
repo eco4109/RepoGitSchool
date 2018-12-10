@@ -11,11 +11,11 @@ public class writeDisc{
 
 	public static void main(String[] args){
 		setBuffer();
-		write("DSK1.dsk",13); //Se escribe en el disco desde la posicion 7 
+		write("DSK1.dsk",13); //Se escribe en el disco desde la posicion 9
 		System.out.println("\nSe escribió en el disco correctamente ... \n");
 	}
 
-	public static void setBuffer(){
+	public static void setBuffer(){ //Setea el BUFFER a escribir
 
 		buffer[0]=(byte)0x20;
 buffer[1]=(byte)0x03;
@@ -78,6 +78,7 @@ buffer[57]=(byte)0x50;
 buffer[58]=(byte)0x00;
 buffer[59]=(byte)0x00;
 buffer[60]=(byte)0x00;
+
 buffer[61]=(byte)0x01;
 buffer[62]=(byte)0x00;
 buffer[63]=(byte)0x01;
@@ -87,8 +88,9 @@ buffer[66]=(byte)0x00;
 buffer[67]=(byte)0x01;
 buffer[68]=(byte)0x00;
 buffer[69]=(byte)0x01;
-buffer[70]=(byte)0x20;
-buffer[71]=(byte)0x03;
+
+buffer[70]=(byte)0x20; //MUE_DATO_REG
+buffer[71]=(byte)0x03; //A IP le mete un 0
 buffer[72]=(byte)0x00;
 buffer[73]=(byte)0x00;
 buffer[74]=(byte)0x00;
@@ -217,32 +219,44 @@ buffer[196]=(byte)0x00;
 buffer[197]=(byte)0x00;
 buffer[198]=(byte)0x00;
 buffer[199]=(byte)0x00;
-buffer[200]=(byte)0x21;
+
+buffer[200]=(byte)0x21; //DUMP desde la 100 DEBERIA maldita, DESPUES DE LA INTERRUPCION ESTO ES LO QUE SE EJECUTA
 buffer[201]=(byte)0x00;
 buffer[202]=(byte)0x42;
-buffer[203]=(byte)0xB4;
-buffer[204]=(byte)0x24;
+buffer[203]=(byte)0xC8;
+buffer[204]=(byte)0x00;
 buffer[205]=(byte)0x00;
-buffer[206]=(byte)0x45;
+
+buffer[206]=(byte)0x45;//ALU_DIV
 buffer[207]=(byte)0x00;
-buffer[208]=(byte)0x70;
+
+buffer[208]=(byte)0x70; //	(?)
 buffer[209]=(byte)0x06;
 buffer[210]=(byte)0x00;
 buffer[211]=(byte)0x00;
 buffer[212]=(byte)0x00;
 buffer[213]=(byte)0x8A;
-buffer[214]=(byte)0x01;
-buffer[215]=(byte)0x00;
+
+buffer[214]=(byte)0x01; //MUE_BUS_REGISTRO 
+buffer[215]=(byte)0x00; //LO DEL BUS 0 AL REGISTRO A, o sea de "ALU_B1" a RA
+
 buffer[216]=(byte)0x70;
 buffer[217]=(byte)0x04;
 buffer[218]=(byte)0x00;
 buffer[219]=(byte)0x00;
 buffer[220]=(byte)0x00;
 buffer[221]=(byte)0x01;
-buffer[222]=(byte)0x45;
+
+buffer[222]=(byte)0x45; //ALU_DIV
 buffer[223]=(byte)0x00;
+
 buffer[224]=(byte)0x70;
 buffer[225]=(byte)0x06;
+buffer[226]=(byte)0x00;
+buffer[227]=(byte)0x00;
+buffer[228]=(byte)0x00;
+buffer[229]=(byte)0x63;
+buffer[230]=(byte)0x01;
 }
 
 	public static void write(String Archivo, int pos){

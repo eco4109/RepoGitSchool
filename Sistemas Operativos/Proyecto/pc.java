@@ -123,7 +123,7 @@ public class pc{
 	static float res_alu;
 	static String NoSirve;
 
-	public static String pausa(){
+	public static synchronized String pausa(){
 		BufferedReader entrada = new BufferedReader(new InputStreamReader(System.in)) ;
 		String nada = null;
 		try{
@@ -133,7 +133,7 @@ public class pc{
 		}
 		return nada;
 	}
-	public static int verificaValor(int valor, int num){
+	public static synchronized int verificaValor(int valor, int num){
 		int masc1=128;
 		int masc2=64;
 		int masc3=32;
@@ -192,7 +192,7 @@ public class pc{
 		return inBinary;
 	}
 
-	public static void capta(){
+	public static synchronized void capta(){
 		//System.out.println("1");
 		int x=forceint(IEEE_a_flotante(R[BP]) + IEEE_a_flotante(R[IP]));
 		//System.out.println("2");
@@ -214,8 +214,8 @@ public class pc{
 		System.out.printf("Buffer de DATO: %02X", buff_dato[0]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[1]);
 		System.out.printf("Buffer de DATO: %02X", buff_dato[2]);
-		System.out.printf("Buffer de DATO: %02X", buff_dato[3]);
-		*/
+		System.out.printf("Buffer de DATO: %02X", buff_dato[3]);*/
+		
 	}
 
 	public static int char_to_int(char caracter){ //Funcition for transform CHARACTERS INTO INTEGERS
@@ -223,7 +223,7 @@ public class pc{
 		return aux;
 	}
 
-	public static String[] float_to_IEEE(float numberF){ //Function for transform a FLOAT number into IEE
+	public static synchronized String[] float_to_IEEE(float numberF){ //Function for transform a FLOAT number into IEE
 		//Like the "ieee.java teacher´s code" but in one function
 		//System.out.println("Lo que entró (en flotante): "+ numberF);
 		int numberI = Float.floatToIntBits(numberF);
@@ -254,7 +254,7 @@ public class pc{
 		return result.toUpperCase();
 	}
 
-	public static void traduce(){
+	public static synchronized void traduce(){
 		int k = verificaValor(forceint(buff_trad[0]),1);
 		int s = verificaValor(forceint(buff_trad[0]),2);
 		int L = verificaValor(forceint(buff_trad[0]),3);
@@ -308,7 +308,7 @@ public class pc{
 		return num=Integer.parseInt(numero,2);
 	}
 
-	public static void ejecuta(){
+	public static synchronized void ejecuta(){
 		switch(cod_inst){
 			case MUE_REG_REG:
 				R[dest]=R[orig];
@@ -450,12 +450,12 @@ public class pc{
 		}
 		
 	}
-	public static int forceint( float f){
+	public static synchronized int forceint( float f){
 		int valorEntero = (int) f;
 		return valorEntero;
 	}
 	
-	public static void push(int x){
+	public static synchronized void push(int x){
 		if(((EnInterrupcion)&&(x==1))){ //Si estoy en interrupcion y entra una d ereloj, NO HACER NADA x = 0 <- interrupcion de reloj
 			System.out.print(" ");
 		}else{
@@ -474,7 +474,7 @@ public class pc{
 		}
 	}
 
-	public static int pop(){
+	public static synchronized int pop(){
 		if(n==0){
 			System.out.println("cola vacia");
 		}else{
@@ -489,7 +489,7 @@ public class pc{
 		return x;
 	}
 	
-	public static void dump(int mem){
+	public static synchronized void dump(int mem){
 		String var1, var2;
 		int temp1;
 		String[] NomReg=new String[14];
@@ -531,9 +531,7 @@ public class pc{
 		System.out.print("\n");
 		if(!NoSirve.equals("x")){
 			NoSirve="";
-			//System.out.println("\n\nA la funcion DUMP le entro:  "+mem+"  ==============================================="); 
 			temp1=forceint(IEEE_a_flotante(mem)); 
-			//System.out.println("\n\nSe va a dumpear desde: "+temp1+"  ==============================================="); 
 			temp1=temp1-(temp1%16);
 			temp2=0;
 			temp3=0;
@@ -563,7 +561,7 @@ public class pc{
 		}
 	}
 
-	public static void main(String[] argumento) {
+	public static synchronized void main(String[] argumento) {
 		if(argumento.length!=0){
 			if(argumento[0].equals("BIOS"))
 				BIOS.IniciaBIOS();
@@ -606,15 +604,15 @@ public class pc{
 		new java.util.Scanner(System.in).nextLine();
 
 
-
-		COMPAQ.start();
 		C_Interrup.start();
+		COMPAQ.start();
 		CLOCK.start();
 	}
 }
 
 class Computadora extends Thread{
-	public void run(){
+	public synchronized void run(){
+		System.out.println("... ... Se inicio EL CPU");
 		while(!pc.PSW[14]){
 			int x;
 			int aux;
@@ -628,27 +626,26 @@ class Computadora extends Thread{
 			pc.capta();
 		 	pc.traduce();
 		 	pc.ejecuta();
+		 	System.out.println("\nUn Ciclo de Fetch Terminado ...");
 			System.out.println("Al terminar este Ciclo, el IP quedo como:     "+pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
 			System.out.println("Al terminar este Ciclo, el BP quedo como:     "+pc.forceint(pc.IEEE_a_flotante(pc.R[pc.BP])));
-
-		 	System.out.println("Un Ciclo de Fetch Terminado ...");
+		 	
 		 	
 		 	if(pc.CPUInt){
-		 		System.out.println("--- Ciclo de FETCH interrumpido ---\n");
+		 		System.out.println("\n\n--- Se esta atendiendo una interrupcion ---");
 				pc.EnInterrupcion = true;
 				int c;
 				int y = 0;
 				//Respaldar el IP y el BP;
 
-				//Leer los primeros 5 bytes de la RAM y hacerlo entero
+				//Leer los primeros 4 bytes de la RAM y hacerlo entero (el codigo del profe pone un 100 alli)
 				y+=((pc.RAM[0] & 0xFF)<<24);
 				y+=((pc.RAM[1] & 0xFF)<<16);
 				y+=((pc.RAM[2] & 0xFF)<<8);
 				y+=((pc.RAM[3] & 0xFF)<<0);
 				y=(int)pc.IEEE_a_flotante(y);
 
-				System.out.println("En los primeros 4 bytes de la RAM hay: "+y);
-				//Ir a esa posicion de la RAM y allí guardar a BP (en 4 bytes)
+				//Ir a esa posicion de la RAM y allí guardar a BP (en 4 bytes) o sea en RAM[100](4 bytes) guarda a BP
 				pc.RAM[y] = (byte)(pc.R[pc.BP]>>>24);
 				y = y+1;
 				pc.RAM[y] = (byte)(pc.R[pc.BP]>>>16);
@@ -666,84 +663,29 @@ class Computadora extends Thread{
 				y = y+1;
 				pc.RAM[y] = (byte)(pc.R[pc.IP]>>>0);
 
-				pc.dump(1120403456); //dumpea desde la 100
-				System.exit(4);
+				//pc.dump(1120403456); //dumpea desde la 100
+				//System.exit(4);
 
-
+				//Lee los bytes de la RAM (o sea del 4 al 7) (donde el codigo ya puso un 200)
 				int mr = 0;
 				mr+=((pc.RAM[4] & 0xFF)<<24);
 				mr+=((pc.RAM[5] & 0xFF)<<16);
 				mr+=((pc.RAM[6] & 0xFF)<<8);
 				mr+=((pc.RAM[7] & 0xFF)<<0);
 
-				//Actualizar el BP
+				//Actualizar el BP (carga el 200) a BP e IP vale 0 o sea irá despues de la interrupcion a ejecutar RAM[200] que es el DUMP en 100
+				//o sea, despues de una interrucion va a DUMPEAR en la posicion 100
 				pc.R[pc.BP] = mr;
 				//Iniciar el IP desde cero (no quiere decir iniciar desde la posicion 0 de la RAM) recordqar eso del desplazamiento
 				pc.R[pc.IP] = 0;
+
+				pc.PSW[15] = true;
+				System.out.println("--- Interrupcion terminada de atender ---");
+				//Apagar banderas de interrupciones y dmas
 				//Sacar la interrupcion de la cola
 				pc.pop();
-
-				//Apagar banderas de interrupciones y dmas
 				pc.CPUInt = false;
 				pc.EnInterrupcion = false;
-				pc.PSW[15] = true;
-
-
-
-		 		//pc.dump(1120403456); //dumpea desde la 100
-		 		/*System.out.println("--- Ciclo de Fetch Interrumpido --- \7");
-				pc.CPUInt = false;
-				pc.EnInterrupcion = true;
-				//Respaldar el BP e IP
-				//System.out.printf("\n\n(hexadecimal) RAM[0: %02X \n",pc.RAM[0]);
-				//System.out.printf("\n\n(hexadecimal) RAM[1: %02X \n",pc.RAM[1]);
-
-				r0 = pc.RAM[0]&0xFF;
-				r1 = pc.RAM[1]&0xFF;
-
-				//System.out.println("\n\n(decimal) RAM[0:  "+r0+" \n");
-				//System.out.println("\n\n(decimal) RAM[1:  "+r1+" \n\n");
-
-				System.out.println("El IP: "+ pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
-				System.out.println("El BP: "+ pc.forceint(pc.IEEE_a_flotante(pc.R[pc.BP])));
-
-				y = (pc.RAM[0]&0xFF) + (pc.RAM[1]&0xFF);
-
-				//System.out.println("Suma de la RAM [0] y RAM[1] : "+ y);
-
-				pc.RAM[y] = (byte) (pc.forceint(pc.IEEE_a_flotante(pc.R[pc.BP])));
-				pc.RAM[y+4] = (byte) (pc.forceint(pc.IEEE_a_flotante(pc.R[pc.IP])));
-
-				//System.out.printf("Entonces, RAM en la posicion %d  =  %02X",y, pc.RAM[y]);
-				//System.out.printf("Entonces, RAM en la posicion %d =  %02X",y+4,pc.RAM[y+4]);
-
-				//System.out.printf("\n\n(hexadecimal) RAM[2: %02X \n",pc.RAM[2]);
-				//System.out.printf("\n\n(hexadecimal) RAM[3: %02X \n",pc.RAM[3]);
-
-				r2 = pc.RAM[2]&0xFF;
-				r3 = pc.RAM[3]&0xFF;
-
-				//System.out.println("\n\n(decimal) RAM[2:  "+r2+" \n");
-				//System.out.println("\n\n(decimal) RAM[3:  "+r3+" \n\n");
-
-				pc.R[pc.BP] = pc.flotante_a_IEEE((float) (r2+r3));
-
-				System.out.println("BP QUEDA COMO (en IEEE): "+pc.R[pc.BP]);
-				System.out.println("BP QUEDA COMO (en float): "+pc.IEEE_a_flotante(pc.R[pc.BP]));
-
-				pc.R[pc.IP] = pc.flotante_a_IEEE(0);
-
-				System.out.println("IP QUEDA COMO (en IEEE): "+pc.R[pc.IP]);
-				System.out.println("IP QUEDA COMO (en float): "+pc.IEEE_a_flotante(pc.R[pc.IP]));
-	
-				//pc.RAM[y+4] = pc.BP;
-				
-				//forceint(IEEE_a_flotante(R[BP]) + IEEE_a_flotante(R[IP]))
-
-				//pc.RAM[pc.BP] = pc.RAM[3] + pc.RAM[4]
-				
-				//REESPALDAR PROCEDIMIENTO ACTUAL!!!
-		 		//pc.PSW[15] = true; //Cambiamos a modo kernel*/
 		 	}	
 		}
 	}
@@ -767,8 +709,8 @@ VECTOR DE INTERRUPCIONES
 4           Controlasor de Interrupciones
 */
 class c_interrup extends Thread{
-	public void run(){
-		System.out.println("Se inicio el controlador de Interrupciones");
+	public  synchronized void run(){
+		System.out.println("... ... Se inicio el CONTROLADOR DE INTERRUPCIONES");
 		while(true){
 			while(pc.dormidoV[4]);
 			while(pc.n == 0); //Mientras la cola de interrupciones estpa vacia, se cicla allí
@@ -779,15 +721,15 @@ class c_interrup extends Thread{
 }
 
 class reloj extends Thread{ //Proceso del reloj
-	public void run(){ 
-		long quantum = 2000; //Interrupción de justicia
+	public synchronized void run(){ 
+		System.out.println("... ... Se inicio el RELOJ");
+		long quantum = 5000; //Interrupción de justicia
 		long horaSistema, horaInicial, diferencia;
 		horaInicial = System.currentTimeMillis();
 		while(true){
 			horaSistema = System.currentTimeMillis();
 			diferencia = horaSistema - horaInicial;	
 			if((diferencia >= quantum - 20)&&(diferencia <= quantum +20)){
-				System.out.println("--- INTERRUPCION DE RELOJ ----------------------------------------------------------------------------");
 				pc.CPUInt = true;
 				pc.push(1);
 				horaInicial = horaSistema;					
